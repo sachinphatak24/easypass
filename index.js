@@ -14,6 +14,10 @@ app.use(bodyParser.urlencoded({limit: '30mb', extended:true}));
 app.use(cors());
 
 
+app.get('/', function(req, res){
+    res.send({ title: 'Welcome home!' });
+});
+
 app.use('/user', userRouter);
 
 
