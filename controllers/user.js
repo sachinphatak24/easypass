@@ -32,12 +32,12 @@ export const signup = async(req,res) => {
 
     try {
         const existingUser = await userModal.findOne({email});
-        // if(existingUser) return res.status(400).json({message: " User Already Exists!"});
-        if(existingUser) return res.error({status:400 ,message:"User Already Exists!"});
+        if(existingUser) return res.json({status:400, message:"User Already Exists!"});
+        // if(existingUser) return res.error({status:400 ,message:"User Already Exists!"});
         const hashedPassword = await bcrypt.hash(password,12);
 
-        const result = await userModal.create({email, password: hashedPassword,type:`${type}` ,name:`${name}`})
-        res.json({status:200,message:'Registered Successfully!'});
+        const result = await userModal.create({email, password: hashedPassword,type:`${type}` ,name:`${name}`});
+        res.json({status:200,result,message:'Registered Successfully!'});
         
 
 
@@ -59,7 +59,7 @@ export const adminSignup = async(req,res) => {
         const result = await userModal.create({email, password: hashedPassword,type:`${type}` ,name:`${name}`})
 
 
-        res.status(200).json({result: result,});
+        res.status(200).json({result: result});
 
 
     } catch (error) {
