@@ -29,7 +29,27 @@ export const signin = async(req,res) => {
 
 export const signup = async(req,res) => {
     const { name,email,type,password} = req.body;
-    
+
+    try {
+        const existingUser = await userModal.findOne({email});
+        // if(existingUser) return res.status(400).json({message: " User Already Exists!"});
+        if(existingUser) return res.error({status:400 ,message:"User Already Exists!"});
+        const hashedPassword = await bcrypt.hash(password,12);
+
+        const result = await userModal.create({email, password: hashedPassword,type:`${type}` ,name:`${name}`})
+        res.json({status:200,message:'Registered Successfully!'});
+        
+
+
+    } catch (error) {
+        res.status(500).json({message:'Something Went Wrong.'});
+
+    }
+}
+
+export const adminSignup = async(req,res) => {
+    const { name,email,type,password} = req.body;
+
     try {
         const existingUser = await userModal.findOne({email});
         if(existingUser) return res.status(400).json({message: " User Already Exists!"});
@@ -38,9 +58,8 @@ export const signup = async(req,res) => {
 
         const result = await userModal.create({email, password: hashedPassword,type:`${type}` ,name:`${name}`})
 
-        const token = jwt.sign({email:result.email, id:result._id, type:result.type}, 'testing', {expiresIn: "3h"});
 
-        res.status(200).json({result: result,token});
+        res.status(200).json({result: result,});
 
 
     } catch (error) {
