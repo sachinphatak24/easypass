@@ -8,9 +8,4 @@ router.post("/signin",signin);
 router.post("/signup",signup);
 
 
-router.get('/signup', function(req, res){
-    res.send({ title: 'Welcome!' });
-});
-
-
 export default router;
