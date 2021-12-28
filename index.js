@@ -15,7 +15,7 @@ app.use(cors());
 
 
 app.get('/', function(req, res){
-    res.send({ title: 'Welcome home!' });
+    res.send({ title: 'Welcome home Hello!' });
 });
 
 app.use('/user', userRouter);
