@@ -59,7 +59,7 @@ export const verifyProfile = async(req,res) => {
 //Get Route for admins to view allProfiles
 export const allProfiles = async(req,res) => {
     try {
-        const profiles = await Profile.find().populate('user',['name','type']);
+        const profiles = await Profile.find();
         const userType = req.userInfo.type;
         if(userType === 'busAdmin' || userType==='collegeAdmin' || userType==='railwayAdmin'){
             return res.json(profiles);
