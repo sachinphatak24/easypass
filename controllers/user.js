@@ -5,6 +5,7 @@ import userModal from '../models/user.js';
 
 const secret = 'testing';
 
+//User SignIn
 export const signin = async(req,res) => {
     const {email,password,type} = req.body;
 
@@ -18,7 +19,7 @@ export const signin = async(req,res) => {
 
         if(!(type === existingUser.type)) return res.json({status:400,message: "Error in type!"});
 
-        const token = jwt.sign({email: existingUser.email , id: existingUser.id, type:existingUser.type}, 'testing', {expiresIn:"3h"});
+        const token = jwt.sign({email: existingUser.email , id: existingUser._id, type:existingUser.type}, secret, {expiresIn:"3h"});
 
         res.json({status:200,message:'Successfully Logged In',result: existingUser,token});
 
@@ -26,7 +27,7 @@ export const signin = async(req,res) => {
         res.json({status:500, message:'Something Went Wrong.'});
     }
 }
-
+// User SignUp
 export const signup = async(req,res) => {
     const { name,email,type,password} = req.body;
 
@@ -45,7 +46,7 @@ export const signup = async(req,res) => {
 
     }
 }
-
+// Admin SignUp 
 export const adminSignup = async(req,res) => {
     const { name,email,type,password} = req.body;
 
