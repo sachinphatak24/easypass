@@ -21,8 +21,9 @@ export const adminverifyProfilee = async(req,res) => {
     try {
         Profile.findOne({profileVerifyApplied:true,email:req.body.email}).then(profileToVerify => {
             if (profileToVerify) {
+                console.log(profileToVerify);
                 Profile.findOneAndUpdate(
-                    {profileVerifyApplied:true},
+                    {profileVerifyApplied:true,email:req.body.email},
                     {$set:{profileVerifystatus:'Verified'}}
                     ).then(res.json({status:200, message:'Profile Verified'}));
                 } else {
