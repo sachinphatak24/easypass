@@ -37,7 +37,7 @@ export const signup = async(req,res) => {
         const hashedPassword = await bcrypt.hash(password,12);
 
 
-        const result = await userModal.create({email, password: hashedPassword,name:`${name}`});
+        const result = await userModal.create({email, password: hashedPassword,name:`${name}`,type:`${type}`});
         res.json({status:200,message:'Registered Successfully!'});
         
 
