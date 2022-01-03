@@ -63,7 +63,7 @@ export const allProfiles = async(req,res) => {
         const profiles = await Profile.find();
         const userType = req.userInfo.type;
         if(userType === 'busAdmin' || userType==='collegeAdmin' || userType==='railwayAdmin'){
-            return res.json(profiles);
+            return res.json({status:200,profiles});
         }else{
             res.json({erroMsg:'Need Admin Privilages To Access This Route.'});
         }
@@ -96,10 +96,10 @@ export const createProfile = async(req,res) => {
                 {user: req.userId},
                 {$set: profileFields},
                 {new: true}
-                ).then(profilee =>res.json(profilee));
+                ).then(profilee =>res.json({status:200,profilee}));
             }else{
                 // Create
-            new Profile(profileFields).save().then(profilee => res.json(profilee));
+            new Profile(profileFields).save().then(profilee => res.json({status:200,profilee}));
         }    
         });
     } catch (error) {
@@ -112,7 +112,7 @@ export const currentProfile = async (req,res) => {
     try{
         const profile = await Profile.findOne({user:req.userId}).populate('user',['name','type']);
         if(!profile) return res.json({status:'400',message:'There is no profile for this user. Please Create one at `profile/create`'});
-        res.json(profile);
+        res.json({status:200,profile});
     } catch(err){
         res.json({status:'500', error:'Server Error'});
     } 
