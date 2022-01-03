@@ -1,35 +1,66 @@
-// import bcrypt from 'bcryptjs';
-// import  jwt  from 'jsonwebtoken';
-
 import Profile from '../models/profile.js';
 
-
-export const verifyProfile = async(req,res) => {
-    const {email,password,type} = req.body;
-
+// Get Route for collegeAdmin to view Users Profiles for Verification
+export const adminverifyProfile = async(req,res) => {
     try {
-        const existingUser = await userModal.findOne({email});
-        if(!existingUser) return res.json({status:404,message: "User Doesn't Exist!"});
-
-        const isPasswordCorrect = await bcrypt.compare(password,existingUser.password);
-
-        if(!isPasswordCorrect) return res.json({status:400,message: "Invalid Credentials!"});
-
-        if(!(type === existingUser.type)) return res.json({status:400,message: "Error in type!"});
-
-        // const token = jwt.sign({email: existingUser.email , id: existingUser._id, type:existingUser.type}, secret, {expiresIn:"3h"});
-
-        res.json({status:200,message:'Successfully Verified User Profile',result: existingUser});
-
+        const profiles = await Profile.find({profileVerifyApplied:true});
+        const userType = req.userInfo.type;
+        console.log(profiles.branchName);
+        if(userType ==='collegeAdmin'){
+            return res.json(profiles);
+        }else{
+            res.json({erroMsg:'Need Admin Privilages To Access This Route.'});
+        }
     } catch (error) {
-        res.json({status:500, message:'Something Went Wrong.'});
+        res.json({errorMsg:error});
     }
 }
 
-//allProfiles
+// Post Route For Admin To Verify custom User's Profile
+export const adminverifyProfilee = async(req,res) => {
+    try {
+        Profile.findOne({profileVerifyApplied:true,email:req.body.email}).then(profileToVerify => {
+            if (profileToVerify) {
+                console.log(profileToVerify);
+                Profile.findOneAndUpdate(
+                    {profileVerifyApplied:true,email:req.body.email},
+                    {$set:{profileVerifystatus:'Verified'}}
+                    ).then(res.json({status:200, message:'Profile Verified'}));
+                } else {
+                    res.json({status:404,message:'There is no profile to be verified'});
+                }
+            }
+            )
+        } catch (error) {
+            res.json({status:400, message:error});
+    }
+}
+
+
+// Post Route For User To Submit Profile For Verification
+export const verifyProfile = async(req,res) => {
+    try {    
+        Profile.findOne({user:req.userId,profileVerifyApplied:false}).then(profilee => {
+        if(profilee){
+            Profile.findOneAndUpdate(
+                {user: req.userId},
+                {$set: {profileVerifyApplied:true}}
+                // {new: true}
+                ).then(res.json({status:200,message:'Profile successfully sent for verification'}));
+            }else{
+                res.json({status:401, message:'Please Create a Profile before applying for verification or Please check if profile is already applied for verification'})       
+        }    
+        });
+    } catch (error) {
+        res.json({status:'500', errorr:error});        
+    }
+}
+
+
+//Get Route for admins to view allProfiles
 export const allProfiles = async(req,res) => {
     try {
-        const profiles = await Profile.find().populate('user',['name','type']);
+        const profiles = await Profile.find();
         const userType = req.userInfo.type;
         if(userType === 'busAdmin' || userType==='collegeAdmin' || userType==='railwayAdmin'){
             return res.json({status:200,profiles});
@@ -41,7 +72,7 @@ export const allProfiles = async(req,res) => {
     }
 }
 
-// Create or Update Profile
+// Post Route to Create or Update User's Profile
 export const createProfile = async(req,res) => {
     try {    
         // Profile Object
@@ -50,15 +81,13 @@ export const createProfile = async(req,res) => {
         
         profileFields.user = req.userId;
         profileFields.userTypee = req.userInfo.type;
+        profileFields.email = req.userInfo.email;
         if(nameAsPerIdCard) profileFields.nameAsPerIdCard = nameAsPerIdCard;
         if(dateOfBirth) profileFields.dateOfBirth = dateOfBirth;
         if (collegeName) profileFields.collegeName = collegeName;
         if(collegeId) profileFields.collegeId=collegeId;
         if(branchName) profileFields.branchName=branchName;
         if(currentYearOfStudy) profileFields.currentYearOfStudy=currentYearOfStudy;
-        
-        // profileFields.passinfo= {};
-        // if (req.body.passtype) profileFields.passinfo.passtype = req.body.passtype;
         
         // Update
         Profile.findOne({user:req.userId}).then(profilee => {
@@ -78,7 +107,7 @@ export const createProfile = async(req,res) => {
     }
 } 
 
-// Current Profile
+//Get Route to View Current User's Profile
 export const currentProfile = async (req,res) => {
     try{
         const profile = await Profile.findOne({user:req.userId}).populate('user',['name','type']);

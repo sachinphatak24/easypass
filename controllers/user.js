@@ -36,7 +36,8 @@ export const signup = async(req,res) => {
         if(existingUser) return res.json({status:400, message:"User Already Exists!"});
         const hashedPassword = await bcrypt.hash(password,12);
 
-        const result = await userModal.create({email, password: hashedPassword,type:`${type}` ,name:`${name}`});
+
+        const result = await userModal.create({email, password: hashedPassword,name:`${name}`});
         res.json({status:200,message:'Registered Successfully!'});
         
 
