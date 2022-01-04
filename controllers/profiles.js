@@ -28,17 +28,6 @@ import cloudinary from '../utils/cloudinary.js'
 
 
 
-
-
-
-
-
-
-
-
-
-
-
 // Get Route for collegeAdmin to view Users Profiles for Verification
 export const adminverifyProfile = async(req,res) => {
     try {
@@ -117,7 +106,6 @@ export const createProfile = async(req,res) => {
         // Profile Object
         const {nameAsPerIdCard,dateOfBirth,collegeName,branchName,currentYearOfStudy} = req.body;
         let profileFields = {};
-        
         const result = await cloudinary.uploader.upload(req.file.path);
         console.log(result);
         profileFields.user = req.userId;
