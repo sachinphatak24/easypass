@@ -1,5 +1,33 @@
 import Profile from '../models/profile.js';
 
+
+
+// ==================================
+
+
+import multer from 'multer';
+
+import cloudinary from '../utils/cloudinary.js'
+
+// import upload from '../utils/multer.js';
+
+
+// router.post('/upload', upload.single('image'), async (req,res) =>  {
+//     try {
+//         console.log("Hited af");
+//         const result = await cloudinary.uploader.upload(req.file.path)
+//         res.json(result);
+//     } catch (error) {
+//         console.log(error);
+//     }
+// });
+
+
+// =============================
+
+
+
+
 // Get Route for collegeAdmin to view Users Profiles for Verification
 export const adminverifyProfile = async(req,res) => {
     try {
@@ -76,16 +104,19 @@ export const allProfiles = async(req,res) => {
 export const createProfile = async(req,res) => {
     try {    
         // Profile Object
-        const {nameAsPerIdCard,dateOfBirth,collegeName,collegeId,branchName,currentYearOfStudy} = req.body;
+        const {nameAsPerIdCard,dateOfBirth,collegeName,branchName,currentYearOfStudy} = req.body;
         let profileFields = {};
-        
+        const result = await cloudinary.uploader.upload(req.file.path);
+        console.log(result);
         profileFields.user = req.userId;
         profileFields.userTypee = req.userInfo.type;
+        profileFields.cloudinaryId=result.public_id;
+        profileFields.collegeId=result.secure_url;
+        
         profileFields.email = req.userInfo.email;
         if(nameAsPerIdCard) profileFields.nameAsPerIdCard = nameAsPerIdCard;
         if(dateOfBirth) profileFields.dateOfBirth = dateOfBirth;
         if (collegeName) profileFields.collegeName = collegeName;
-        if(collegeId) profileFields.collegeId=collegeId;
         if(branchName) profileFields.branchName=branchName;
         if(currentYearOfStudy) profileFields.currentYearOfStudy=currentYearOfStudy;
         
@@ -103,6 +134,7 @@ export const createProfile = async(req,res) => {
         }    
         });
     } catch (error) {
+        console.log(error);
         res.json({status:'500', errorr:error});        
     }
 } 
