@@ -7,7 +7,7 @@ const profileSchema = mongoose.Schema({
     email:{type:String,ref:'User',required:true},
     nameAsPerIdCard:{type:String,required:true},
     dateOfBirth:{type:String,required:true},
-    collegeId:{type: String},
+    collegeId:{type: String,required: true},
     cloudinaryId:{type: String},
     collegeName: {type: String, required: true}, 
     currentYearOfStudy: {type: String, required: true}, 
