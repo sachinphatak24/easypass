@@ -72,9 +72,9 @@ export const verifyProfile = async(req,res) => {
         if(profilee){
             Profile.findOneAndUpdate(
                 {user: req.userId},
-                {$set: {profileVerifyApplied:true}}
-                // {new: true}
-                ).then(res.json({status:200, profilee,message:'Profile successfully sent for verification'}));
+                {$set: {profileVerifyApplied:true}},
+                {new: true}
+                ).then(profilee => res.json({status:200, profilee,message:'Profile successfully sent for verification'}));
             }else{
                 res.json({status:401, message:'Please Create a Profile before applying for verification or Please check if profile is already applied for verification'})       
         }    
