@@ -33,8 +33,7 @@ export const adminverifyProfile = async(req,res) => {
     try {
         const profiles = await Profile.find({profileVerifyApplied:true});
         const userType = req.userInfo.type;
-        console.log(profiles.branchName);
-        if(userType ==='collegeAdmin'){
+        if(userType ==='college admin'){
             return res.json(profiles);
         }else{
             res.json({erroMsg:'Need Admin Privilages To Access This Route.'});
@@ -90,7 +89,8 @@ export const allProfiles = async(req,res) => {
     try {
         const profiles = await Profile.find();
         const userType = req.userInfo.type;
-        if(userType === 'busAdmin' || userType==='collegeAdmin' || userType==='railwayAdmin'){
+        console.log(userType);
+        if(userType === 'bus admin' || userType==='college admin' || userType==='railway admin'){
             return res.json({status:200,profiles});
         }else{
             res.json({erroMsg:'Need Admin Privilages To Access This Route.'});
