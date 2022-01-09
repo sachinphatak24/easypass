@@ -31,10 +31,8 @@ import cloudinary from '../utils/cloudinary.js'
 // Get Route for collegeAdmin to view Users Profiles for Verification
 export const adminverifyProfile = async(req,res) => {
     try {
-        const profiles = await Profile.find({profileVerifyApplied:true,collegeName:req.userInfo.collegeName});
+        const profiles = await Profile.find({profileVerifyApplied:true,collegeName:req.userInfo.collegeName,profileVerifystatus:'UnVerified'});
         const userType = req.userInfo.type;
-        const userinfo = req.userInfo;
-        console.log(req.userInfo);
         if(userType ==='college admin'){
             return res.json(profiles);
         }else{
@@ -50,7 +48,6 @@ export const adminverifyProfilee = async(req,res) => {
     try {
         Profile.findOne({profileVerifyApplied:true,email:req.body.email,collegeName:req.userInfo.collegeName}).then(profileToVerify => {
             if (profileToVerify) {
-                console.log(profileToVerify);
                 Profile.findOneAndUpdate(
                     {profileVerifyApplied:true,email:req.body.email},
                     {$set:{profileVerifystatus:'Verified'}}
