@@ -61,24 +61,54 @@ export const adminverifyProfile = async(req,res) => {
     }
 }
 
+// // Post Route For Admin To Verify custom User's Profile
+// export const adminverifyProfilee = async(req,res) => {
+//     try {
+//         Profile.findOne({profileVerifyApplied:true,email:req.body.email,collegeName:req.userInfo.collegeName}).then(profileToVerify => {
+//             if (profileToVerify) {
+//                 Profile.findOneAndUpdate(
+//                     {profileVerifyApplied:true,email:req.body.email},
+//                     {$set:{profileVerifystatus:'Verified'}}
+//                     ).then(res.json({status:200, message:'Profile Verified'}));
+//                 } else {
+//                     res.json({status:404,message:'There is no profile to be verified'});
+//                 }
+//             }
+//             )
+//         } catch (error) {
+//             res.json({status:400, message:error});
+//     }
+// }
+
 // Post Route For Admin To Verify custom User's Profile
 export const adminverifyProfilee = async(req,res) => {
     try {
-        Profile.findOne({profileVerifyApplied:true,email:req.body.email,collegeName:req.userInfo.collegeName}).then(profileToVerify => {
+        Profile.findOne({profileVerifyApplied:true,email:req.body.email,collegeName:req.userInfo.collegeName,profileVerifystatus:'UnVerified'}).then(profileToVerify => {
             if (profileToVerify) {
                 Profile.findOneAndUpdate(
                     {profileVerifyApplied:true,email:req.body.email},
-                    {$set:{profileVerifystatus:'Verified'}}
-                    ).then(res.json({status:200, message:'Profile Verified'}));
-                } else {
-                    res.json({status:404,message:'There is no profile to be verified'});
-                }
+                    {$set:{profileVerifystatus:'Verified'}},
+                    {new: true}
+                    ).then(  async() => {
+                        const unVerifiedProfiles = await Profile.find({profileVerifyApplied:true,collegeName:req.userInfo.collegeName,profileVerifystatus:'UnVerified'});
+                        const verifiedProfiles = await Profile.find({profileVerifyApplied:true, collegeName:req.userInfo.collegeName,profileVerifystatus:'Verified'});
+                        const userType = req.userInfo.type;
+                        if(userType ==='college admin'){
+                           res.json({status:'Successfully Verified!',unVerifiedProfiles,verifiedProfiles});
+                        }else{
+                            res.json({error:'Need Admin Privilages To Access This Route.'});
+                        }
+                    })
+            } else {
+                res.json({ status:404,error:'There is no Profile to be verified And/Or The profile is already verified'});
             }
-            )
-        } catch (error) {
+                   
+        })
+    } catch (error) {
             res.json({status:400, message:error});
-    }
 }
+}
+    
 
 
 // Post Route For User To Submit Profile For Verification
