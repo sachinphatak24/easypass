@@ -25,6 +25,24 @@ import cloudinary from '../utils/cloudinary.js'
 
 // =============================
 
+export const adminverifyProfileAll = async(req,res) => {
+    try {
+        const unVerifiedProfiles = await Profile.find({profileVerifyApplied:true,collegeName:req.userInfo.collegeName,profileVerifystatus:'UnVerified'});
+        const verifiedProfiles = await Profile.find({profileVerifyApplied:true, collegeName:req.userInfo.collegeName,profileVerifystatus:'Verified'});
+        const userType = req.userInfo.type;
+        if(userType ==='college admin'){
+            return res.json({unVerifiedProfiles,verifiedProfiles});
+        }else{
+            res.json({error:'Need Admin Privilages To Access This Route.'});
+        }
+    } catch (error) {
+        res.json({error:error});
+    }
+}
+
+
+
+
 
 
 

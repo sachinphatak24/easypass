@@ -11,15 +11,15 @@ import cloudinary from '../utils/cloudinary.js'
 import upload from '../utils/multer.js';
 
 
-router.post('/upload', upload.single('image'), async (req,res) =>  {
-    try {
-        console.log("Hited af");
-        const result = await cloudinary.uploader.upload(req.file.path)
-        res.json(result);
-    } catch (error) {
-        console.log(error);
-    }
-});
+// router.post('/upload', upload.single('image'), async (req,res) =>  {
+//     try {
+//         console.log("Hited af");
+//         const result = await cloudinary.uploader.upload(req.file.path)
+//         res.json(result);
+//     } catch (error) {
+//         console.log(error);
+//     }
+// });
 
 
 
@@ -31,7 +31,7 @@ router.post('/upload', upload.single('image'), async (req,res) =>  {
 
 // =========================================================
 
-import {allProfiles, verifyProfile, adminverifyProfile, adminverifyProfilee, createProfile, currentProfile} from '../controllers/profiles.js';
+import {allProfiles, verifyProfile, adminverifyProfile, adminverifyProfilee, createProfile, currentProfile, adminverifyProfileAll} from '../controllers/profiles.js';
 
 //All Profiles Route (Hidden:Admins)
 router.get('/all',authenticate, allProfiles);
@@ -41,6 +41,9 @@ router.post('/verify',authenticate, verifyProfile);
 
 // Check Users Profiles For Verification(Hidden:collegeAdmin)
 router.get('/adminverify',authenticate, adminverifyProfile);
+
+// Check List Of Users Profiles For Verification(Hidden:collegeAdmin)
+router.get('/adminverifyall',authenticate, adminverifyProfileAll);
 
 // Confirm Verification of Users(Hidden:collegeAdmin)
 router.post('/adminverify',authenticate, adminverifyProfilee);
