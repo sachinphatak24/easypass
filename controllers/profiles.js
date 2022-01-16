@@ -84,12 +84,13 @@ export const adminverifyProfile = async(req,res) => {
 export const adminverifyProfilee = async(req,res) => {
     try {
         Profile.findOne({profileVerifyApplied:true,email:req.body.email,collegeName:req.userInfo.collegeName,profileVerifystatus:'UnVerified'}).then(profileToVerify => {
+            console.log(req.userInfo.collegeName);
             if (profileToVerify) {
                 Profile.findOneAndUpdate(
                     {profileVerifyApplied:true,email:req.body.email},
                     {$set:{profileVerifystatus:'Verified'}},
                     {new: true}
-                    ).then(  async() => {
+                    ).then( async() => {
                         const unVerifiedProfiles = await Profile.find({profileVerifyApplied:true,collegeName:req.userInfo.collegeName,profileVerifystatus:'UnVerified'});
                         const verifiedProfiles = await Profile.find({profileVerifyApplied:true, collegeName:req.userInfo.collegeName,profileVerifystatus:'Verified'});
                         const userType = req.userInfo.type;
@@ -99,8 +100,8 @@ export const adminverifyProfilee = async(req,res) => {
                             res.json({error:'Need Admin Privilages To Access This Route.'});
                         }
                     })
-            } else {
-                res.json({ status:404,error:'There is no Profile to be verified And/Or The profile is already verified'});
+                } else {
+                res.json({ status:404,error:'There is no Profile to be verified And/Or The profile is already verified And/Or Need Admin Privilages'});
             }
                    
         })
