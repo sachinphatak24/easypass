@@ -6,7 +6,7 @@ const userSchema = mongoose.Schema({
     password:{type:String,required:true},
     type:{type:String, default:'Student'},
     id:{type:String},
-    date:{type:Date, default:Date.now}
+    date:{type:String, default:Date().toString()}
 })
 
 export default mongoose.model("User", userSchema);

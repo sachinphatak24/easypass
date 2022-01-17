@@ -88,7 +88,7 @@ export const adminverifyProfilee = async(req,res) => {
             if (profileToVerify) {
                 Profile.findOneAndUpdate(
                     {profileVerifyApplied:true,email:req.body.email},
-                    {$set:{profileVerifystatus:'Verified'}},
+                    {$set:{profileVerifystatus:'Verified',profileVerifyDate:Date().toString()}},
                     {new: true}
                     ).then( async() => {
                         const unVerifiedProfiles = await Profile.find({profileVerifyApplied:true,collegeName:req.userInfo.collegeName,profileVerifystatus:'UnVerified'});
