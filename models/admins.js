@@ -7,7 +7,7 @@ const adminSchema = mongoose.Schema({
     password:{type:String,required:true},
     type:{type:String, default:'college admin'},
     id:{type:String},
-    date:{type:Date, default:Date.now}
+    date:{type:String, default:Date().toString()}
 })
 
 export default mongoose.model("admin", adminSchema);

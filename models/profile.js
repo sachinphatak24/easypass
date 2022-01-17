@@ -13,9 +13,10 @@ const profileSchema = mongoose.Schema({
     currentYearOfStudy: {type: String, required: true}, 
     branchName:{type:String,required:true},
     location:{type:String},
-    date:{type:Date, default: Date.now},
+    date:{type:String, default: Date().toString()},
     profileVerifyApplied:{ type: Boolean, default: false },
     profileVerifystatus:{type:String,default:"UnVerified"},
+    profileVerifyDate:{type:String,default:''},
     passinfo:[{
         passType:{type:String,default:''},
         passVerifyStatus:{type:String,default:'UnVerified'},
