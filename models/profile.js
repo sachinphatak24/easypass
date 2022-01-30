@@ -17,6 +17,22 @@ const profileSchema = mongoose.Schema({
     profileVerifyApplied:{ type: Boolean, default: false },
     profileVerifystatus:{type:String,default:"UnVerified"},
     profileVerifyDate:{type:String,default:''},
+    applications:[{
+        currentApplication:[{
+            travelOption:{type:String},
+            startLocation:{type:String},
+            endLocation:{type:String},
+            travelPassPeriod:{type:String},
+            addressProof:{type:String}
+        }],
+        pastApplications:[{
+            travelOption:{type:String},
+            startLocation:{type:String},
+            endLocation:{type:String},
+            travelPassPeriod:{type:String},
+            addressProof:{type:String}
+        }]
+    }],
     passinfo:[{
         passType:{type:String,default:''},
         passVerifyStatus:{type:String,default:'UnVerified'},
