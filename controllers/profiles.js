@@ -316,3 +316,56 @@ export const currentProfile = async (req,res) => {
         res.json({status:'500', error:'Server Error'});
     } 
 }
+
+
+import PDFDocument from "pdfkit";
+import user from '../models/user.js';
+
+export const pdfGen = async (req, res, next) => {
+    
+    const userprofile = await Profile.findOne({user:req.userId}).populate('user',['name','type']);
+    function buildPDF(datacallback, endcallback) {
+        const doc = new PDFDocument({size: 'A4'});
+        doc.on('data',datacallback);
+        doc.on('end',endcallback);
+        doc.image('logo.png', 50, 45, { width: 50 })
+        // doc.image('https://res.cloudinary.com/dxi0gikd0/image/upload/v1641390665/lt0ctidyhfdkt31fqcl8.jpg', {
+        //     fit: [250, 300],
+        //     align: 'center',
+        
+        //     valign: 'center'
+        // });
+        doc.lineWidth(6);
+        doc.lineCap('butt').moveTo(40, 20).lineTo(571, 20).stroke();
+        doc.lineCap('butt').moveTo(43, 20).lineTo(40, 820).stroke();
+        doc.lineCap('butt').moveTo(568, 20).lineTo(565, 820).stroke();
+        doc.lineCap('butt').moveTo(42, 817).lineTo(565, 817).stroke();
+        doc.font('IBMPlexSansThaiLooped-Bold.ttf').fontSize(60).fillColor('cyan').text(`${userprofile.nameAsPerIdCard}`,115,20);
+        doc.fontSize(55).fillColor('gray').text(`From: ${userprofile.applications.currentApplication.startLocation.toUpperCase()} `,100,140,{continued:true}).fillColor('black').text(`To: ${userprofile.applications.currentApplication.endLocation.toUpperCase()}`);
+        doc.fontSize(25).fillColor('black').text(`Means Of Transport:- ${userprofile.applications.currentApplication.travelOption.toUpperCase()}`,100,340);
+        // doc.moveTo(0, 160).lineTo(200, 160).lineTo(400, 160).stroke();
+        doc.fontSize(25).fillColor('black').text(`Applied On:- ${userprofile.applications.currentApplication.appliedOn.slice(0,16)}`,100,400);
+        doc.fontSize(25).fillColor('black').text(`Valid For:- ${userprofile.applications.currentApplication.travelPassPeriod.toUpperCase()}`,100,460);
+        doc.fontSize(25).fillColor('black').text(`College:- ${userprofile.collegeName.toUpperCase()}`,100,520);
+        doc.fontSize(25).fillColor('black').text(`Date Of Birth:- ${userprofile.dateOfBirth}`,100,580);
+        doc.fontSize(25).fillColor('black').text(`   `,100,686);
+        doc.fontSize(25).fillColor('black').text(`Email:- ${userprofile.email}`,{align:'right'});
+        doc.end();
+    }
+    
+    const stream = res.writeHead(200, {
+      'Content-Type': 'application/pdf',
+      'Content-Disposition': `attachment;filename=ConcessionLetter.pdf`,
+    });
+
+    buildPDF(
+        (chunk) => stream.write(chunk),
+        () => stream.end()
+      );
+};
+
+
+
+
+
+

@@ -12,6 +12,11 @@ import upload from '../utils/multer.js';
 
 
 
+router.get('/pdf',authenticate, pdfGen);
+
+
+
+
 
 
 
@@ -19,7 +24,7 @@ import upload from '../utils/multer.js';
 
 // =========================================================
 
-import {allProfiles, verifyProfile, adminverifyProfile, adminverifyProfilee, createProfile, currentProfile, adminverifyProfileAll, newApplication, adminverifyapp} from '../controllers/profiles.js';
+import {allProfiles, verifyProfile, adminverifyProfile, adminverifyProfilee, createProfile, currentProfile, adminverifyProfileAll, newApplication, adminverifyapp, pdfGen} from '../controllers/profiles.js';
 
 //All Profiles Route (Hidden:Admins)
 router.get('/all',authenticate, allProfiles);
