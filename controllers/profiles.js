@@ -8,22 +8,149 @@ import Profile from '../models/profile.js';
 import multer from 'multer';
 
 import cloudinary from '../utils/cloudinary.js'
+import profile from '../models/profile.js';
 
-// import upload from '../utils/multer.js';
+export const newApplication = async(req,res) => {
+    try {
+        const applicationFields = {};
+        applicationFields.applications = {};    
+        applicationFields.applications.currentApplication = {};    
+        const {travelOption,startLocation,endLocation,travelPassPeriod} = req.body;
+        // const {travelOption,startLocation,endLocation,travelPassPeriod,addressProof,cloudinaryId} = applicationFields.applications.currentApplication;
+        // console.log(travelOption,startLocation,endLocation,travelPassPeriod);
+        const result = await cloudinary.uploader.upload(req.file.path);
+        if(travelOption)  applicationFields.applications.currentApplication.travelOption = travelOption;
+        if(startLocation) applicationFields.applications.currentApplication.startLocation = startLocation;
+        if(endLocation) applicationFields.applications.currentApplication.endLocation = endLocation;
+        applicationFields.applications.currentApplication.applicationStatus = 'Under Process';
+        applicationFields.applications.currentApplication.addressProof=result.secure_url;
+        if(travelPassPeriod) applicationFields.applications.currentApplication.travelPassPeriod = travelPassPeriod;
+        
+        // Update
+        Profile.findOne({user:req.userId}).then( async profilee => {  
+            const newApp = {
+                travelOption:travelOption,
+                startLocation:startLocation,
+                endLocation:endLocation,
+                travelPassPeriod:travelPassPeriod,
+                applicationStatus:"Under Process",
+                addressProof:result.secure_url
+            };
+            console.log(profilee);
+            // Add new app to allApps array
+            profilee.applications.allApplications.unshift(newApp);
+            profilee.save();
+            
+            if(profilee){
+            Profile.findOneAndUpdate(
+                    {user: req.userId},
+                    {$set: applicationFields},
+                    {new: true}
+            ).then( profilee => res.json({status:200,profilee}));
+            
+        }else{
+                // Create
+                new Profile(applicationFields).save().then(async profilee =>  res.json({status:200,profilee}));
+            }    
+        });
+        // Profile.findOne({ user: req.userId }).then(profil => {
+                
+        //         const newApp = {
+        //             travelOption:travelOption,
+        //             startLocation:startLocation,
+        //             endLocation:endLocation,
+        //             travelPassPeriod:travelPassPeriod,
+        //             applicationStatus:"Under Process",
+        //             addressProof:result.secure_url
+        //         };
+        //         console.log(profil);
+        //         // Add new app to allApps array
+        //         profil.applications.allApplications.unshift(newApp);
+        //         profil.save().then(profil => res.json(profil));
+            
+            
 
+        //     });
+        } catch (error) {
+        console.log(error);
+        res.json({status:'500', errorr:error});        
+    }
+}
 
-// router.post('/upload', upload.single('image'), async (req,res) =>  {
-//     try {
-//         console.log("Hited af");
-//         const result = await cloudinary.uploader.upload(req.file.path)
-//         res.json(result);
-//     } catch (error) {
-//         console.log(error);
-//     }
-// });
+// =============================
+export const adminverifyapp = async(req,res) => {
+    try {
+        Profile.findOne({profileVerifyApplied:true,email:req.body.email,collegeName:req.userInfo.collegeName,profileVerifystatus:'Verified','applications.currentApplication.applicationStatus':'Under Process'}).then(profileToApproove => {
+            console.log(profileToApproove);
+            if (profileToApproove) {
+                Profile.findOneAndUpdate(
+                    {email:req.body.email,'applications.currentApplication.applicationStatus':"Under Process"},
+                    {$set:{'applications.currentApplication.applicationStatus':"Approoved",'applications.currentApplication.applicationAcceptedOn':Date().toString()}},
+                    {new: true}
+                    ).then( async() => {
+                        const unApproovedProfiles = await Profile.find({'applications.currentApplication.applicationStatus':"Under Process"});
+                        const approoveddProfiles = await Profile.find({'applications.currentApplication.applicationStatus':"Approoved"});
+                        const userType = req.userInfo.type;
+                        if(userType ==='college admin'){
+                           res.json({status:'Successfully Verified!',unApproovedProfiles,approoveddProfiles});
+                        }else{
+                            res.json({error:'Need Admin Privilages To Access This Route.'});
+                        }
+                    })
+                } else {
+                res.json({ status:404,error:'There is no Profile to be verified And/Or The profile is already verified And/Or Need Admin Privilages'});
+            }
+                   
+        })
+    } catch (error) {
+        res.json({status:400, message:error});
+    }
+}
 
 
 // =============================
+
+
+// export const adminverifyapp = async(req,res) => {
+    // try {
+        // Profile.findOne({'applications[0].currentApplication.applicationStatus':"Under Process",email:req.body.email}).then( async applicationToVerify => {
+            // let calm = applicationToVerify;
+            // console.log(calm.applications);
+
+            // if(applicationToVerify){
+                // let calmy = applicationToVerify;
+                // console.log(calmy);
+                // console.log(calmy.applications[0].currentApplication.applicationStatus);
+                // (calmy.applications[0].currentApplication.applicationStatus);
+                
+                // Profile.findOneAndUpdate(
+                //     {'applications[0].currentApplication.applicationStatus':'Under Process','email':'req.body.email'},
+                //     {$set:{'applications[0].currentApplication.applicationStatus':'Approoved','applications[0].currentApplication.applicationAcceptedOn':Date().toString()}},
+                //     {new: true}
+                //     ).then( async() => {
+                //     console.log(calmy.applications);
+                // const approovedProfiles = await Profile.find({'applications[0].currentApplication.applicationStatus':'Under Process'});
+                // console.log('halo= ' + approovedProfiles);
+                    // const unappoovedProfiles = await Profile.find({profileVerifystatus:'UnVerified', collegeName:req.userInfo.collegeName,applicationStatus:'Under Process'});
+                    // const userType = req.userInfo.type;
+                    // if(userType ==='college admin' || userType==='bus admin' || userType ==='train admin'){
+                        // res.json({status:'Successfully Approoved!',approovedProfiles});
+                    // }else{
+                        // res.json({error:'Need Admin Privilages To Access This Route.'});
+                    // }
+                // });
+            // }else{
+                // res.json({ status:404,error:'There is no Application to be Approoved And/Or The Application is already Approoved And/Or Need Admin Privilages'})
+            // }
+//         })
+//     } catch (error) {
+//         res.json({status:400, message:error});   
+//     }
+
+// }
+
+
+
 
 export const adminverifyProfileAll = async(req,res) => {
     try {
@@ -39,12 +166,6 @@ export const adminverifyProfileAll = async(req,res) => {
         res.json({error:error});
     }
 }
-
-
-
-
-
-
 
 // Get Route for collegeAdmin to view Users Profiles for Verification
 export const adminverifyProfile = async(req,res) => {
@@ -81,6 +202,7 @@ export const adminverifyProfile = async(req,res) => {
 // }
 
 // Post Route For Admin To Verify custom User's Profile
+
 export const adminverifyProfilee = async(req,res) => {
     try {
         Profile.findOne({profileVerifyApplied:true,email:req.body.email,collegeName:req.userInfo.collegeName,profileVerifystatus:'UnVerified'}).then(profileToVerify => {
@@ -106,12 +228,10 @@ export const adminverifyProfilee = async(req,res) => {
                    
         })
     } catch (error) {
-            res.json({status:400, message:error});
-}
+        res.json({status:400, message:error});
+    }
 }
     
-
-
 // Post Route For User To Submit Profile For Verification
 export const verifyProfile = async(req,res) => {
     try {    
@@ -130,7 +250,6 @@ export const verifyProfile = async(req,res) => {
         res.json({status:'500', errorr:error});        
     }
 }
-
 
 //Get Route for admins to view allProfiles
 export const allProfiles = async(req,res) => {
@@ -178,8 +297,8 @@ export const createProfile = async(req,res) => {
                 ).then(profilee =>res.json({status:200,profilee}));
             }else{
                 // Create
-            new Profile(profileFields).save().then(profilee => res.json({status:200,profilee}));
-        }    
+                new Profile(profileFields).save().then(profilee => res.json({status:200,profilee}));
+            }    
         });
     } catch (error) {
         console.log(error);
