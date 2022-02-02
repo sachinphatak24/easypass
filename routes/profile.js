@@ -7,7 +7,7 @@ import authenticate from '../middleware/authentication.js';
 import upload from '../utils/multer.js';
 // =========================================================
 
-import {allProfiles, verifyProfile, adminverifyProfile, adminverifyProfilee, createProfile, currentProfile, adminverifyProfileAll, newApplication, adminverifyapp, pdfGen} from '../controllers/profiles.js';
+import {allProfiles, verifyProfile, adminverifyProfile, adminverifyProfilee, createProfile, currentProfile, adminverifyProfileAll, newApplication, adminverifyapp, pdfGen, adminGetApp} from '../controllers/profiles.js';
 
 //All Profiles Route (Hidden:Admins)
 router.get('/all',authenticate, allProfiles);
@@ -26,6 +26,9 @@ router.get('/adminverify',authenticate, adminverifyProfile);
 
 // Check List Of Users Profiles For Verification(Hidden:collegeAdmin)
 router.get('/adminverifyall',authenticate, adminverifyProfileAll);
+
+// Check List Of Users Profiles For Verification(Hidden:collegeAdmin)
+router.get('/admingetapp',authenticate, adminGetApp);
 
 // Confirm Verification of Users(Hidden:collegeAdmin)
 router.post('/adminverify',authenticate, adminverifyProfilee);

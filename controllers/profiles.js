@@ -16,7 +16,9 @@ export const newApplication = async(req,res) => {
         applicationFields.applications.currentApplication.applicationStatus = 'Under Process';
         applicationFields.applications.currentApplication.addressProof=result.secure_url;
         if(travelPassPeriod) applicationFields.applications.currentApplication.travelPassPeriod = travelPassPeriod;
-        
+        applicationFields.applications.currentApplication.appliedOn=Date().toString();
+        applicationFields.applications.currentApplication.appliedOn=Date().toString();
+
         // Update
         Profile.findOne({user:req.userId}).then( async profilee => {  
             const newApp = {
@@ -50,7 +52,22 @@ export const newApplication = async(req,res) => {
     }
 }
 
-// Admin Verify New Application of Concession Letter 
+//Get Route for Admin to view  Applications requiring Approval
+export const adminGetApp = async(req,res) => {
+    try {
+        const unapprovedProfiles = await Profile.find({profileVerifyApplied:true,collegeName:req.userInfo.collegeName,'applications.currentApplication.applicationStatus':'Under Process'});
+        const userType = req.userInfo.type;
+        if(userType ==='college admin'){
+            return res.json(unapprovedProfiles);
+        }else{
+            res.json({erroMsg:'Need Admin Privilages To Access This Route.'});
+        }
+    } catch (error) {
+        res.json({errorMsg:error});
+    }
+}
+
+// Post Route For Admin to Verify New Application of Concession Letter 
 export const adminverifyapp = async(req,res) => {
     try {
         Profile.findOne({profileVerifyApplied:true,email:req.body.email,collegeName:req.userInfo.collegeName,profileVerifystatus:'Verified','applications.currentApplication.applicationStatus':'Under Process'}).then(profileToApproove => {

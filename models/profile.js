@@ -15,12 +15,12 @@ const profileSchema = mongoose.Schema({
     date:{type:String, default: Date().toString()},
     profileVerifyApplied:{ type: Boolean, default: false },
     profileVerifystatus:{type:String,default:"UnVerified"},
-    profileVerifyDate:{type:String,default:''},
+    profileVerifyDate:{type:String},
     applications:{
         currentApplication:{
-            applicationAcceptedOn:{type:String,default:" "},
-            applicationStatus:{type:String,default:"Under Process"},
-            appliedOn:{type:String,default:Date().toString()},
+            applicationAcceptedOn:{type:String},
+            applicationStatus:{type:String},
+            appliedOn:{type:String},
             travelOption:{type:String},
             startLocation:{type:String},
             endLocation:{type:String},
@@ -33,14 +33,14 @@ const profileSchema = mongoose.Schema({
             startLocation:{type:String},
             endLocation:{type:String},
             travelPassPeriod:{type:String},
-            applicationStatus:{type:String,default:"Under Process"},
-            appliedOn:{type:String,default:Date().toString()},
+            applicationStatus:{type:String},
+            appliedOn:{type:String},
             addressProof:{type:String},
-            applicationAcceptedOn:{type:String,default:" "}
+            applicationAcceptedOn:{type:String}
         }],
     },
         passinfo:[{
-        passType:{type:String,default:''},
+        passType:{type:String},
         passVerifyStatus:{type:String,default:'UnVerified'},
         passApproveStatus:{type:String,default:'UnApproved'},
     }]
