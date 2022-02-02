@@ -230,7 +230,6 @@ export const currentProfile = async (req,res) => {
 //Download Concession Letter for Approoved User Profiles
 export const pdfGen = async (req, res, next) => {
     const userprofile = await Profile.findOne({user:req.userId}).populate('user',['name','type']);
-    // console.log(userprofile.applications.currentApplication.applicationStatus);
     if (userprofile.applications.currentApplication.applicationStatus === 'Under Process') {
         res.json({status:400,message:'Please Wait Until Your Application is Approoved!'})
     } else {
@@ -247,8 +246,8 @@ export const pdfGen = async (req, res, next) => {
             doc.font('IBMPlexSansThaiLooped-Bold.ttf').fontSize(60).fillColor('cyan').text(`${userprofile.nameAsPerIdCard}`,115,40);
             doc.fontSize(55).fillColor('#a3232').text(`From: `,65,140,{continued:true}).fillColor('#6ceffd').text(`${userprofile.applications.currentApplication.startLocation.toUpperCase()} `,{continued:true}).fillColor('#a3232').text(`To: `,{continued:true}).fillColor('#3e7fc').text(`${userprofile.applications.currentApplication.endLocation.toUpperCase()}`);
             doc.fontSize(45).fillColor('black').text(`Via:- `,65,340,{continued:true}).fillColor('#a3232').text(`${userprofile.applications.currentApplication.travelOption.toUpperCase()}`);
-            doc.fontSize(35).fillColor('#261820').text(`Valid From:- ${userprofile.applications.currentApplication.appliedOn.slice(4,16)}`,65,440);
-            doc.fontSize(35).fillColor('#261820').text(`Valid For:- ${userprofile.applications.currentApplication.travelPassPeriod}`,65,500);
+            doc.fontSize(35).fillColor('#261820').text(`Valid From:- ${userprofile.applications.currentApplication.applicationAcceptedOn.slice(4,16)}`,65,440);
+            doc.fontSize(35).fillColor('#261820').text(`Valid For:- Next 3 Days`,65,500);
             doc.fontSize(25).fillColor('#a3232').text(`College:- ${userprofile.collegeName.toUpperCase()}`,65,590);
             doc.fontSize(25).fillColor('#a3232').text(`Date Of Birth:- ${userprofile.dateOfBirth}`,65,650);
             doc.fontSize(25).fillColor('#261820').text(`   `,65,680);
