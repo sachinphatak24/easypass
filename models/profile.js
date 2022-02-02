@@ -3,7 +3,6 @@ import  mongoose from 'mongoose';
 import User from './user.js';
 const profileSchema = mongoose.Schema({
     user:{type: mongoose.Schema.Types.ObjectId,ref:'User'},
-    // usertype:{type:String, default:'Student'},
     email:{type:String,ref:'User',required:true},
     nameAsPerIdCard:{type:String,required:true},
     dateOfBirth:{type:String,required:true},
@@ -17,23 +16,30 @@ const profileSchema = mongoose.Schema({
     profileVerifyApplied:{ type: Boolean, default: false },
     profileVerifystatus:{type:String,default:"UnVerified"},
     profileVerifyDate:{type:String,default:''},
-    applications:[{
-        currentApplication:[{
+    applications:{
+        currentApplication:{
+            applicationAcceptedOn:{type:String,default:" "},
+            applicationStatus:{type:String,default:"Under Process"},
+            appliedOn:{type:String,default:Date().toString()},
             travelOption:{type:String},
             startLocation:{type:String},
             endLocation:{type:String},
             travelPassPeriod:{type:String},
             addressProof:{type:String}
+        },
+        allApplications:[
+        {
+            travelOption:{type:String},
+            startLocation:{type:String},
+            endLocation:{type:String},
+            travelPassPeriod:{type:String},
+            applicationStatus:{type:String,default:"Under Process"},
+            appliedOn:{type:String,default:Date().toString()},
+            addressProof:{type:String},
+            applicationAcceptedOn:{type:String,default:" "}
         }],
-        pastApplications:[{
-            travelOption:{type:String},
-            startLocation:{type:String},
-            endLocation:{type:String},
-            travelPassPeriod:{type:String},
-            addressProof:{type:String}
-        }]
-    }],
-    passinfo:[{
+    },
+        passinfo:[{
         passType:{type:String,default:''},
         passVerifyStatus:{type:String,default:'UnVerified'},
         passApproveStatus:{type:String,default:'UnApproved'},

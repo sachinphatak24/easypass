@@ -4,40 +4,22 @@ const router = express.Router();
 
 import authenticate from '../middleware/authentication.js';
 
-import multer from 'multer';
-
-import cloudinary from '../utils/cloudinary.js'
-
 import upload from '../utils/multer.js';
-
-
-// router.post('/upload', upload.single('image'), async (req,res) =>  {
-//     try {
-//         console.log("Hited af");
-//         const result = await cloudinary.uploader.upload(req.file.path)
-//         res.json(result);
-//     } catch (error) {
-//         console.log(error);
-//     }
-// });
-
-
-
-
-
-
-
-
-
 // =========================================================
 
-import {allProfiles, verifyProfile, adminverifyProfile, adminverifyProfilee, createProfile, currentProfile, adminverifyProfileAll} from '../controllers/profiles.js';
+import {allProfiles, verifyProfile, adminverifyProfile, adminverifyProfilee, createProfile, currentProfile, adminverifyProfileAll, newApplication, adminverifyapp, pdfGen} from '../controllers/profiles.js';
 
 //All Profiles Route (Hidden:Admins)
 router.get('/all',authenticate, allProfiles);
 
 //Apply to Verify Current User's Profile(Hidden:Current User)
 router.post('/verify',authenticate, verifyProfile);
+
+//New Application
+router.post('/newapp',authenticate,upload.single('addressProof'), newApplication);
+
+//Approove new application of user(Hidden:All Admins)
+router.post('/adminverifyapp',authenticate, adminverifyapp);
 
 // Check Users Profiles For Verification(Hidden:collegeAdmin)
 router.get('/adminverify',authenticate, adminverifyProfile);
@@ -54,12 +36,8 @@ router.post('/create', authenticate,upload.single('collegeId'), createProfile);
 // Current User's Profile(Hidden:Current User)
 router.get('/current',authenticate, currentProfile);
 
+//Download Concession Letter
+router.get('/pdf',authenticate, pdfGen);
 
 
 export default router;
-
-
-// // Current User's Pro    file(Hidden:Current User)
-// router.get('/        current',authenticate ,function(req, res){
-//                 res.json({status:'200',UserId:req.userInfo.id, UserEmail:req.userInfo.email, UserType:req.userInfo.type});
-// });
