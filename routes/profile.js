@@ -4,24 +4,7 @@ const router = express.Router();
 
 import authenticate from '../middleware/authentication.js';
 
-import multer from 'multer';
-
-import cloudinary from '../utils/cloudinary.js'
-
 import upload from '../utils/multer.js';
-
-
-
-router.get('/pdf',authenticate, pdfGen);
-
-
-
-
-
-
-
-
-
 // =========================================================
 
 import {allProfiles, verifyProfile, adminverifyProfile, adminverifyProfilee, createProfile, currentProfile, adminverifyProfileAll, newApplication, adminverifyapp, pdfGen} from '../controllers/profiles.js';
@@ -53,6 +36,8 @@ router.post('/create', authenticate,upload.single('collegeId'), createProfile);
 // Current User's Profile(Hidden:Current User)
 router.get('/current',authenticate, currentProfile);
 
+//Download Concession Letter
+router.get('/pdf',authenticate, pdfGen);
 
 
 export default router;

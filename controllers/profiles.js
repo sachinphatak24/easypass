@@ -1,23 +1,14 @@
 import Profile from '../models/profile.js';
-
-
-
-// ==================================
-
-
-import multer from 'multer';
-
+import PDFDocument from "pdfkit";
 import cloudinary from '../utils/cloudinary.js'
-import profile from '../models/profile.js';
 
+//Create New Application For Concession Letter
 export const newApplication = async(req,res) => {
     try {
         const applicationFields = {};
         applicationFields.applications = {};    
         applicationFields.applications.currentApplication = {};    
         const {travelOption,startLocation,endLocation,travelPassPeriod} = req.body;
-        // const {travelOption,startLocation,endLocation,travelPassPeriod,addressProof,cloudinaryId} = applicationFields.applications.currentApplication;
-        // console.log(travelOption,startLocation,endLocation,travelPassPeriod);
         const result = await cloudinary.uploader.upload(req.file.path);
         if(travelOption)  applicationFields.applications.currentApplication.travelOption = travelOption;
         if(startLocation) applicationFields.applications.currentApplication.startLocation = startLocation;
@@ -36,7 +27,7 @@ export const newApplication = async(req,res) => {
                 applicationStatus:"Under Process",
                 addressProof:result.secure_url
             };
-            console.log(profilee);
+            // console.log(profilee);
             // Add new app to allApps array
             profilee.applications.allApplications.unshift(newApp);
             profilee.save();
@@ -53,35 +44,17 @@ export const newApplication = async(req,res) => {
                 new Profile(applicationFields).save().then(async profilee =>  res.json({status:200,profilee}));
             }    
         });
-        // Profile.findOne({ user: req.userId }).then(profil => {
-                
-        //         const newApp = {
-        //             travelOption:travelOption,
-        //             startLocation:startLocation,
-        //             endLocation:endLocation,
-        //             travelPassPeriod:travelPassPeriod,
-        //             applicationStatus:"Under Process",
-        //             addressProof:result.secure_url
-        //         };
-        //         console.log(profil);
-        //         // Add new app to allApps array
-        //         profil.applications.allApplications.unshift(newApp);
-        //         profil.save().then(profil => res.json(profil));
-            
-            
-
-        //     });
         } catch (error) {
-        console.log(error);
+        // console.log(error);
         res.json({status:'500', errorr:error});        
     }
 }
 
-// =============================
+// Admin Verify New Application of Concession Letter 
 export const adminverifyapp = async(req,res) => {
     try {
         Profile.findOne({profileVerifyApplied:true,email:req.body.email,collegeName:req.userInfo.collegeName,profileVerifystatus:'Verified','applications.currentApplication.applicationStatus':'Under Process'}).then(profileToApproove => {
-            console.log(profileToApproove);
+            // console.log(profileToApproove);
             if (profileToApproove) {
                 Profile.findOneAndUpdate(
                     {email:req.body.email,'applications.currentApplication.applicationStatus':"Under Process"},
@@ -107,51 +80,7 @@ export const adminverifyapp = async(req,res) => {
     }
 }
 
-
-// =============================
-
-
-// export const adminverifyapp = async(req,res) => {
-    // try {
-        // Profile.findOne({'applications[0].currentApplication.applicationStatus':"Under Process",email:req.body.email}).then( async applicationToVerify => {
-            // let calm = applicationToVerify;
-            // console.log(calm.applications);
-
-            // if(applicationToVerify){
-                // let calmy = applicationToVerify;
-                // console.log(calmy);
-                // console.log(calmy.applications[0].currentApplication.applicationStatus);
-                // (calmy.applications[0].currentApplication.applicationStatus);
-                
-                // Profile.findOneAndUpdate(
-                //     {'applications[0].currentApplication.applicationStatus':'Under Process','email':'req.body.email'},
-                //     {$set:{'applications[0].currentApplication.applicationStatus':'Approoved','applications[0].currentApplication.applicationAcceptedOn':Date().toString()}},
-                //     {new: true}
-                //     ).then( async() => {
-                //     console.log(calmy.applications);
-                // const approovedProfiles = await Profile.find({'applications[0].currentApplication.applicationStatus':'Under Process'});
-                // console.log('halo= ' + approovedProfiles);
-                    // const unappoovedProfiles = await Profile.find({profileVerifystatus:'UnVerified', collegeName:req.userInfo.collegeName,applicationStatus:'Under Process'});
-                    // const userType = req.userInfo.type;
-                    // if(userType ==='college admin' || userType==='bus admin' || userType ==='train admin'){
-                        // res.json({status:'Successfully Approoved!',approovedProfiles});
-                    // }else{
-                        // res.json({error:'Need Admin Privilages To Access This Route.'});
-                    // }
-                // });
-            // }else{
-                // res.json({ status:404,error:'There is no Application to be Approoved And/Or The Application is already Approoved And/Or Need Admin Privilages'})
-            // }
-//         })
-//     } catch (error) {
-//         res.json({status:400, message:error});   
-//     }
-
-// }
-
-
-
-
+//Get Route For List Of ALl the Verified Profiles & All the UnVerified Profiles Requiring Verification   
 export const adminverifyProfileAll = async(req,res) => {
     try {
         const unVerifiedProfiles = await Profile.find({profileVerifyApplied:true,collegeName:req.userInfo.collegeName,profileVerifystatus:'UnVerified'});
@@ -167,7 +96,7 @@ export const adminverifyProfileAll = async(req,res) => {
     }
 }
 
-// Get Route for collegeAdmin to view Users Profiles for Verification
+// Get Route for collegeAdmin to view UnVerified Profiles
 export const adminverifyProfile = async(req,res) => {
     try {
         const profiles = await Profile.find({profileVerifyApplied:true,collegeName:req.userInfo.collegeName,profileVerifystatus:'UnVerified'});
@@ -182,31 +111,11 @@ export const adminverifyProfile = async(req,res) => {
     }
 }
 
-// // Post Route For Admin To Verify custom User's Profile
-// export const adminverifyProfilee = async(req,res) => {
-//     try {
-//         Profile.findOne({profileVerifyApplied:true,email:req.body.email,collegeName:req.userInfo.collegeName}).then(profileToVerify => {
-//             if (profileToVerify) {
-//                 Profile.findOneAndUpdate(
-//                     {profileVerifyApplied:true,email:req.body.email},
-//                     {$set:{profileVerifystatus:'Verified'}}
-//                     ).then(res.json({status:200, message:'Profile Verified'}));
-//                 } else {
-//                     res.json({status:404,message:'There is no profile to be verified'});
-//                 }
-//             }
-//             )
-//         } catch (error) {
-//             res.json({status:400, message:error});
-//     }
-// }
-
-// Post Route For Admin To Verify custom User's Profile
-
+//Post Route For Admin To Verify Unverified Profiles & Return All The Verified & UnVerified Profiles
 export const adminverifyProfilee = async(req,res) => {
     try {
         Profile.findOne({profileVerifyApplied:true,email:req.body.email,collegeName:req.userInfo.collegeName,profileVerifystatus:'UnVerified'}).then(profileToVerify => {
-            console.log(req.userInfo.collegeName);
+            // console.log(req.userInfo.collegeName);
             if (profileToVerify) {
                 Profile.findOneAndUpdate(
                     {profileVerifyApplied:true,email:req.body.email},
@@ -256,7 +165,7 @@ export const allProfiles = async(req,res) => {
     try {
         const profiles = await Profile.find();
         const userType = req.userInfo.type;
-        console.log(userType);
+        // console.log(userType);
         if(userType === 'bus admin' || userType==='college admin' || userType==='railway admin'){
             return res.json({status:200,profiles});
         }else{
@@ -274,7 +183,7 @@ export const createProfile = async(req,res) => {
         const {nameAsPerIdCard,dateOfBirth,collegeName,branchName,currentYearOfStudy} = req.body;
         let profileFields = {};
         const result = await cloudinary.uploader.upload(req.file.path);
-        console.log(result);
+        // console.log(result);
         profileFields.user = req.userId;
         profileFields.userTypee = req.userInfo.type;
         profileFields.cloudinaryId=result.public_id;
@@ -301,7 +210,7 @@ export const createProfile = async(req,res) => {
             }    
         });
     } catch (error) {
-        console.log(error);
+        // console.log(error);
         res.json({status:'500', errorr:error});        
     }
 } 
@@ -318,50 +227,46 @@ export const currentProfile = async (req,res) => {
 }
 
 
-import PDFDocument from "pdfkit";
-import user from '../models/user.js';
-
+//Download Concession Letter for Approoved User Profiles
 export const pdfGen = async (req, res, next) => {
-    
     const userprofile = await Profile.findOne({user:req.userId}).populate('user',['name','type']);
-    function buildPDF(datacallback, endcallback) {
-        const doc = new PDFDocument({size: 'A4'});
-        doc.on('data',datacallback);
-        doc.on('end',endcallback);
-        doc.image('logo.png', 50, 45, { width: 50 })
-        // doc.image('https://res.cloudinary.com/dxi0gikd0/image/upload/v1641390665/lt0ctidyhfdkt31fqcl8.jpg', {
-        //     fit: [250, 300],
-        //     align: 'center',
+    // console.log(userprofile.applications.currentApplication.applicationStatus);
+    if (userprofile.applications.currentApplication.applicationStatus === 'Under Process') {
+        res.json({status:400,message:'Please Wait Until Your Application is Approoved!'})
+    } else {
+        const buildPDF = (datacallback, endcallback) => {
+            const doc = new PDFDocument({size: 'A4'});
+            doc.on('data',datacallback);
+            doc.on('end',endcallback);
+            doc.image('logo.png', 50, 60, { width: 50 })
+            doc.lineWidth(6);
+            doc.lineCap('butt').moveTo(40, 20).lineTo(563, 20).stroke();
+            doc.lineCap('butt').moveTo(43, 20).lineTo(40, 820).stroke();
+            doc.lineCap('butt').moveTo(560, 20).lineTo(560, 820).stroke();
+            doc.lineCap('butt').moveTo(42, 817).lineTo(560, 817).stroke();
+            doc.font('IBMPlexSansThaiLooped-Bold.ttf').fontSize(60).fillColor('cyan').text(`${userprofile.nameAsPerIdCard}`,115,40);
+            doc.fontSize(55).fillColor('#a3232').text(`From: `,65,140,{continued:true}).fillColor('#6ceffd').text(`${userprofile.applications.currentApplication.startLocation.toUpperCase()} `,{continued:true}).fillColor('#a3232').text(`To: `,{continued:true}).fillColor('#3e7fc').text(`${userprofile.applications.currentApplication.endLocation.toUpperCase()}`);
+            doc.fontSize(45).fillColor('black').text(`Via:- `,65,340,{continued:true}).fillColor('#a3232').text(`${userprofile.applications.currentApplication.travelOption.toUpperCase()}`);
+            doc.fontSize(35).fillColor('#261820').text(`Valid From:- ${userprofile.applications.currentApplication.appliedOn.slice(4,16)}`,65,440);
+            doc.fontSize(35).fillColor('#261820').text(`Valid For:- ${userprofile.applications.currentApplication.travelPassPeriod}`,65,500);
+            doc.fontSize(25).fillColor('#a3232').text(`College:- ${userprofile.collegeName.toUpperCase()}`,65,590);
+            doc.fontSize(25).fillColor('#a3232').text(`Date Of Birth:- ${userprofile.dateOfBirth}`,65,650);
+            doc.fontSize(25).fillColor('#261820').text(`   `,65,680);
+            doc.fontSize(25).fillColor('#261820').text(`   `,65,685);
+            doc.fontSize(25).fillColor('#426484').text(`${userprofile.email}`,{align:'right'});
+            doc.end();
+        }
         
-        //     valign: 'center'
-        // });
-        doc.lineWidth(6);
-        doc.lineCap('butt').moveTo(40, 20).lineTo(571, 20).stroke();
-        doc.lineCap('butt').moveTo(43, 20).lineTo(40, 820).stroke();
-        doc.lineCap('butt').moveTo(568, 20).lineTo(565, 820).stroke();
-        doc.lineCap('butt').moveTo(42, 817).lineTo(565, 817).stroke();
-        doc.font('IBMPlexSansThaiLooped-Bold.ttf').fontSize(60).fillColor('cyan').text(`${userprofile.nameAsPerIdCard}`,115,20);
-        doc.fontSize(55).fillColor('gray').text(`From: ${userprofile.applications.currentApplication.startLocation.toUpperCase()} `,100,140,{continued:true}).fillColor('black').text(`To: ${userprofile.applications.currentApplication.endLocation.toUpperCase()}`);
-        doc.fontSize(25).fillColor('black').text(`Means Of Transport:- ${userprofile.applications.currentApplication.travelOption.toUpperCase()}`,100,340);
-        // doc.moveTo(0, 160).lineTo(200, 160).lineTo(400, 160).stroke();
-        doc.fontSize(25).fillColor('black').text(`Applied On:- ${userprofile.applications.currentApplication.appliedOn.slice(0,16)}`,100,400);
-        doc.fontSize(25).fillColor('black').text(`Valid For:- ${userprofile.applications.currentApplication.travelPassPeriod.toUpperCase()}`,100,460);
-        doc.fontSize(25).fillColor('black').text(`College:- ${userprofile.collegeName.toUpperCase()}`,100,520);
-        doc.fontSize(25).fillColor('black').text(`Date Of Birth:- ${userprofile.dateOfBirth}`,100,580);
-        doc.fontSize(25).fillColor('black').text(`   `,100,686);
-        doc.fontSize(25).fillColor('black').text(`Email:- ${userprofile.email}`,{align:'right'});
-        doc.end();
+        const stream = res.writeHead(200, {
+            'Content-Type': 'application/pdf',
+            'Content-Disposition': `attachment;filename=ConcessionLetter.pdf`,
+        });
+        
+        buildPDF(
+            (chunk) => stream.write(chunk),
+            () => stream.end()
+            );
     }
-    
-    const stream = res.writeHead(200, {
-      'Content-Type': 'application/pdf',
-      'Content-Disposition': `attachment;filename=ConcessionLetter.pdf`,
-    });
-
-    buildPDF(
-        (chunk) => stream.write(chunk),
-        () => stream.end()
-      );
 };
 
 
