@@ -17,7 +17,6 @@ export const newApplication = async(req,res) => {
         applicationFields.applications.currentApplication.addressProof=result.secure_url;
         if(travelPassPeriod) applicationFields.applications.currentApplication.travelPassPeriod = travelPassPeriod;
         applicationFields.applications.currentApplication.appliedOn=Date().toString();
-        applicationFields.applications.currentApplication.appliedOn=Date().toString();
 
         // Update
         Profile.findOne({user:req.userId}).then( async profilee => {  
