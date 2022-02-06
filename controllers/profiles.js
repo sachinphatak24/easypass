@@ -26,9 +26,9 @@ export const newApplication = async(req,res) => {
                 endLocation:endLocation,
                 travelPassPeriod:travelPassPeriod,
                 applicationStatus:"Under Process",
-                addressProof:result.secure_url
+                addressProof:result.secure_url,
+                appliedOn:Date().toString()
             };
-            // console.log(profilee);
             // Add new app to allApps array
             profilee.applications.allApplications.unshift(newApp);
             profilee.save();
@@ -38,7 +38,13 @@ export const newApplication = async(req,res) => {
                     {user: req.userId},
                     {$set: applicationFields},
                     {new: true}
-            ).then( profilee => res.json({status:200,profilee}));
+            ).then( async profilee => {
+                console.log(profilee);
+                const profi = await Profile.findOne({user:req.userId});
+                console.log(profi);
+                res.json({status:200,profi});
+            }
+            );
             
         }else{
                 // Create
@@ -118,9 +124,9 @@ export const adminverifyProfile = async(req,res) => {
         const profiles = await Profile.find({profileVerifyApplied:true,collegeName:req.userInfo.collegeName,profileVerifystatus:'UnVerified'});
         const userType = req.userInfo.type;
         if(userType ==='college admin'){
-            return res.json(profiles);
+            return res.json({status:200 , profiles});
         }else{
-            res.json({erroMsg:'Need Admin Privilages To Access This Route.'});
+            res.json({status:400,erroMsg:'Need Admin Privilages To Access This Route.'});
         }
     } catch (error) {
         res.json({errorMsg:error});
