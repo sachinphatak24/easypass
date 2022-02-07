@@ -61,11 +61,12 @@ export const newApplication = async(req,res) => {
 export const adminGetApp = async(req,res) => {
     try {
         const unapprovedProfiles = await Profile.find({collegeName:req.userInfo.collegeName,'applications.currentApplication.applicationStatus':'Under Process'});
+        const approoveddProfiles = await Profile.find({collegeName:req.userInfo.collegeName,'applications.currentApplication.applicationStatus':'Approoved'})
         const userType = req.userInfo.type;
-        console.log(req.userInfo.collegeName);
-        console.log(unapprovedProfiles);
+        // console.log(req.userInfo.collegeName);
+        // console.log(unapprovedProfiles);
         if(userType ==='college admin'){
-            return res.json({status:200, unapprovedProfiles});
+            return res.json({status:200, unapprovedProfiles,approoveddProfiles});
         }else{
             res.json({erroMsg:'Need Admin Privilages To Access This Route.'});
         }
@@ -79,9 +80,11 @@ export const adminverifyapp = async(req,res) => {
     try {
         Profile.findOne({profileVerifyApplied:true,email:req.body.email,collegeName:req.userInfo.collegeName,profileVerifystatus:'Verified','applications.currentApplication.applicationStatus':'Under Process'}).then(profileToApproove => {
             if (profileToApproove) {
+                // return res.json(profileToApproove.applications.allApplications[0].applicationStatus);
                 Profile.findOneAndUpdate(
                     {email:req.body.email,'applications.currentApplication.applicationStatus':"Under Process"},
-                    {$set:{'applications.currentApplication.applicationStatus':"Approoved",'applications.currentApplication.applicationAcceptedOn':Date().toString()}},
+                    {$set:{'applications.currentApplication.applicationStatus':"Approoved",'profileToApproove.applications.allApplications[0].applicationStatus':"Approoved",'applications.allApplications[0].applicationAcceptedOn':Date().toString(),'applications.currentApplication.applicationAcceptedOn':Date().toString()}},
+                    // {$set:{'profileToApproove.applications.allApplications[0].applicationStatus':"Approoved",'applications.allApplications[0].applicationAcceptedOn':Date().toString()}},
                     {new: true}
                     ).then( async() => {
                         const unApproovedProfiles = await Profile.find({'applications.currentApplication.applicationStatus':"Under Process"});
@@ -252,19 +255,23 @@ export const currentProfile = async (req,res) => {
 
 //Download Concession Letter for Approoved User Profiles
 export const pdfGen = async (req, res, next) => {
-    const userprofile = await Profile.findOne({user:req.userId}).populate('user',['name','type']);
-    if (userprofile.applications.currentApplication.applicationStatus === 'Under Process') {
-        res.json({status:400,message:'Please Wait Until Your Application is Approoved!'})
-    } else {
-        const buildPDF = (datacallback, endcallback) => {
-            const doc = new PDFDocument({size: 'A4'});
-            doc.on('data',datacallback);
-            doc.on('end',endcallback);
-            doc.image('logo.png', 50, 60, { width: 50 })
-            doc.lineWidth(6);
-            doc.lineCap('butt').moveTo(40, 20).lineTo(563, 20).stroke();
-            doc.lineCap('butt').moveTo(43, 20).lineTo(40, 820).stroke();
-            doc.lineCap('butt').moveTo(560, 20).lineTo(560, 820).stroke();
+    try {
+        
+        const userprofile = await Profile.findOne({user:req.userId}).populate('user',['name','type']);
+        if (userprofile) {
+            
+            if (userprofile.applications.currentApplication.applicationStatus === 'Under Process') {
+                res.json({status:400,message:'Please Wait Until Your Application is Approoved!'})
+            } else {
+                const buildPDF = (datacallback, endcallback) => {
+                    const doc = new PDFDocument({size: 'A4'});
+                doc.on('data',datacallback);
+                doc.on('end',endcallback);
+                doc.image('logo.png', 50, 60, { width: 50 })
+                doc.lineWidth(6);
+                doc.lineCap('butt').moveTo(40, 20).lineTo(563, 20).stroke();
+                doc.lineCap('butt').moveTo(43, 20).lineTo(40, 820).stroke();
+                doc.lineCap('butt').moveTo(560, 20).lineTo(560, 820).stroke();
             doc.lineCap('butt').moveTo(42, 817).lineTo(560, 817).stroke();
             doc.font('IBMPlexSansThaiLooped-Bold.ttf').fontSize(60).fillColor('cyan').text(`${userprofile.nameAsPerIdCard}`,115,40);
             doc.fontSize(55).fillColor('#a3232').text(`From: `,65,140,{continued:true}).fillColor('#6ceffd').text(`${userprofile.applications.currentApplication.startLocation.toUpperCase()} `,{continued:true}).fillColor('#a3232').text(`To: `,{continued:true}).fillColor('#3e7fc').text(`${userprofile.applications.currentApplication.endLocation.toUpperCase()}`);
@@ -288,6 +295,12 @@ export const pdfGen = async (req, res, next) => {
             (chunk) => stream.write(chunk),
             () => stream.end()
             );
+        }
+    } else {
+        res.json({status:404,resp:"Please Create a Profile!"})    
+    }
+    } catch (error) {
+        res.json({status:400,msg:"Whoopsie"});
     }
 };
 
