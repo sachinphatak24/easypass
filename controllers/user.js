@@ -28,7 +28,6 @@ export const signin = async(req,res) => {
             if(!(type === existingAdmin.type)) return res.json({status:400,message: "Error in type!"});
             const token = jwt.sign({email: existingAdmin.email ,collegeName: existingAdmin.collegeName, id: existingAdmin._id, type:existingAdmin.type}, secret, {expiresIn:"5h"});
             res.json({status:200,message:'Successfully Logged In As Admin',result: existingAdmin,token});
-            
         }
 
 
