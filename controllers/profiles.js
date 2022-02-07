@@ -61,12 +61,12 @@ export const newApplication = async(req,res) => {
 export const adminGetApp = async(req,res) => {
     try {
         const unapprovedProfiles = await Profile.find({collegeName:req.userInfo.collegeName,'applications.currentApplication.applicationStatus':'Under Process'});
-        const approoveddProfiles = await Profile.find({collegeName:req.userInfo.collegeName,'applications.currentApplication.applicationStatus':'Approoved'})
+        const approveddProfiles = await Profile.find({collegeName:req.userInfo.collegeName,'applications.currentApplication.applicationStatus':'Approved'})
         const userType = req.userInfo.type;
         // console.log(req.userInfo.collegeName);
         // console.log(unapprovedProfiles);
         if(userType ==='college admin'){
-            return res.json({status:200, unapprovedProfiles,approoveddProfiles});
+            return res.json({status:200, unapprovedProfiles,approveddProfiles});
         }else{
             res.json({erroMsg:'Need Admin Privilages To Access This Route.'});
         }
@@ -82,16 +82,18 @@ export const adminverifyapp = async(req,res) => {
             if (profileToApproove) {
                 // return res.json(profileToApproove.applications.allApplications[0].applicationStatus);
                 Profile.findOneAndUpdate(
-                    {email:req.body.email,'applications.currentApplication.applicationStatus':"Under Process"},
-                    {$set:{'applications.currentApplication.applicationStatus':"Approoved",'profileToApproove.applications.allApplications[0].applicationStatus':"Approoved",'applications.allApplications[0].applicationAcceptedOn':Date().toString(),'applications.currentApplication.applicationAcceptedOn':Date().toString()}},
-                    // {$set:{'profileToApproove.applications.allApplications[0].applicationStatus':"Approoved",'applications.allApplications[0].applicationAcceptedOn':Date().toString()}},
+                    // {email:req.body.email,'applications.currentApplication.applicationStatus':"Under Process"},
+                    {email:req.body.email,'applications.allApplications.applicationStatus':"Under Process"},
+                    // {email:req.body.email},
+                    {$set:{'applications.currentApplication.applicationStatus':"Approved",'applications.allApplications.$.applicationStatus':"Approved",'applications.allApplications.$.applicationAcceptedOn':Date().toString(),'applications.currentApplication.applicationAcceptedOn':Date().toString()}},
+                    // {$set:{'applications.allApplications.$.applicationStatus':"calm"}},
                     {new: true}
                     ).then( async() => {
-                        const unApproovedProfiles = await Profile.find({'applications.currentApplication.applicationStatus':"Under Process"});
-                        const approoveddProfiles = await Profile.find({'applications.currentApplication.applicationStatus':"Approoved"});
+                        const unApprovedProfiles = await Profile.find({'applications.currentApplication.applicationStatus':"Under Process"});
+                        const approveddProfiles = await Profile.find({'applications.currentApplication.applicationStatus':"Approved"});
                         const userType = req.userInfo.type;
                         if(userType ==='college admin'){
-                           res.json({status:'Successfully Verified!',unApproovedProfiles,approoveddProfiles});
+                           res.json({status:'Successfully Verified!',unApprovedProfiles,approveddProfiles});
                         }else{
                             res.json({error:'Need Admin Privilages To Access This Route.'});
                         }
@@ -253,7 +255,7 @@ export const currentProfile = async (req,res) => {
 }
 
 
-//Download Concession Letter for Approoved User Profiles
+//Download Concession Letter for Approved User Profiles
 export const pdfGen = async (req, res, next) => {
     try {
         
@@ -261,7 +263,7 @@ export const pdfGen = async (req, res, next) => {
         if (userprofile) {
             
             if (userprofile.applications.currentApplication.applicationStatus === 'Under Process') {
-                res.json({status:400,message:'Please Wait Until Your Application is Approoved!'})
+                res.json({status:400,message:'Please Wait Until Your Application is Approved!'})
             } else {
                 const buildPDF = (datacallback, endcallback) => {
                     const doc = new PDFDocument({size: 'A4'});
