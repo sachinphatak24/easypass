@@ -256,12 +256,11 @@ export const currentProfile = async (req,res) => {
 
 
 //Download Concession Letter for Approved User Profiles
-export const pdfGen = async (req, res, next) => {
+export const pdfGen = async (req, res) => {
     try {
         
         const userprofile = await Profile.findOne({user:req.userId}).populate('user',['name','type']);
         if (userprofile) {
-            
             if (userprofile.applications.currentApplication.applicationStatus === 'Under Process') {
                 res.json({status:400,message:'Please Wait Until Your Application is Approved!'})
             } else {

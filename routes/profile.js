@@ -40,7 +40,7 @@ router.post('/create', authenticate,upload.single('collegeId'), createProfile);
 router.get('/current',authenticate, currentProfile);
 
 //Download Concession Letter
-router.get('/pdf',authenticate, pdfGen);
+router.post('/pdf',authenticate, pdfGen);
 
 
 export default router;
