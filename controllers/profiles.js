@@ -60,10 +60,12 @@ export const newApplication = async(req,res) => {
 //Get Route for Admin to view  Applications requiring Approval
 export const adminGetApp = async(req,res) => {
     try {
-        const unapprovedProfiles = await Profile.find({profileVerifyApplied:true,collegeName:req.userInfo.collegeName,'applications.currentApplication.applicationStatus':'Under Process'});
+        const unapprovedProfiles = await Profile.find({collegeName:req.userInfo.collegeName,'applications.currentApplication.applicationStatus':'Under Process'});
         const userType = req.userInfo.type;
+        console.log(req.userInfo.collegeName);
+        console.log(unapprovedProfiles);
         if(userType ==='college admin'){
-            return res.json(unapprovedProfiles);
+            return res.json({status:200, unapprovedProfiles});
         }else{
             res.json({erroMsg:'Need Admin Privilages To Access This Route.'});
         }
@@ -76,7 +78,6 @@ export const adminGetApp = async(req,res) => {
 export const adminverifyapp = async(req,res) => {
     try {
         Profile.findOne({profileVerifyApplied:true,email:req.body.email,collegeName:req.userInfo.collegeName,profileVerifystatus:'Verified','applications.currentApplication.applicationStatus':'Under Process'}).then(profileToApproove => {
-            // console.log(profileToApproove);
             if (profileToApproove) {
                 Profile.findOneAndUpdate(
                     {email:req.body.email,'applications.currentApplication.applicationStatus':"Under Process"},

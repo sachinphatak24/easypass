@@ -3,6 +3,7 @@ import  jwt  from 'jsonwebtoken';
 
 import userModal from '../models/user.js';
 import admin from '../models/admins.js';
+import profile from '../models/profile.js';
 
 const secret = 'testing';
 
@@ -12,13 +13,14 @@ export const signin = async(req,res) => {
 
     try {
         const existingUser = await userModal.findOne({email});
+        const existingProfile = await profile.findOne({email});
         const existingAdmin = await admin.findOne({email});
         if(!existingUser && !existingAdmin) return res.json({status:404,message: "User/Admin Doesn't Exist!"});
         if (existingUser) {
             const isPasswordCorrect = await bcrypt.compare(password,existingUser.password);
             if(!isPasswordCorrect) return res.json({status:400,message: "Invalid Credentials!"});
             if(!(type === existingUser.type)) return res.json({status:400,message: "Error in type!"});
-            const token = jwt.sign({email: existingUser.email ,collegeName: existingUser.collegeName, id: existingUser._id, type:existingUser.type}, secret, {expiresIn:"3h"});
+            const token = jwt.sign({email: existingUser.email ,collegeName: existingProfile.collegeName, id: existingUser._id, type:existingUser.type}, secret, {expiresIn:"3h"});
             res.json({status:200,message:'Successfully Logged In As Student',result: existingUser,token});
         }else if (existingAdmin) {
             const isPasswordCorrect = await bcrypt.compare(password,existingAdmin.password);
