@@ -16,15 +16,26 @@ export const signin = async(req,res) => {
         const existingProfile = await profile.findOne({email});
         const existingAdmin = await admin.findOne({email});
         if(!existingUser && !existingAdmin) return res.json({status:404,message: "User/Admin Doesn't Exist!"});
-        if (existingUser) {
+        if (existingProfile) {
             const isPasswordCorrect = await bcrypt.compare(password,existingUser.password);
             if(!isPasswordCorrect) return res.json({status:400,message: "Invalid Credentials!"});
             if(!(type === existingUser.type)) return res.json({status:400,message: "Error in type!"});
-            if (existingProfile.collegeName) {
+            // if (existingProfile === null) {
+                // const token = jwt.sign({email: existingUser.email , id: existingUser._id, type:existingUser.type}, secret, {expiresIn:"3h"});
+            // } else {
                 const token = jwt.sign({email: existingUser.email ,collegeName:existingProfile.collegeName, id: existingUser._id, type:existingUser.type}, secret, {expiresIn:"3h"});
-            } else {
+            // }
+            res.json({status:200,message:'Successfully Logged In As Student',result: existingUser,token});
+        }else if (existingUser) {
+            const isPasswordCorrect = await bcrypt.compare(password,existingUser.password);
+            if(!isPasswordCorrect) return res.json({status:400,message: "Invalid Credentials!"});
+            console.log(existingProfile);
+            if(!(type === existingUser.type)) return res.json({status:400,message: "Error in type!"});
+            // if (existingProfile === null) {
                 const token = jwt.sign({email: existingUser.email , id: existingUser._id, type:existingUser.type}, secret, {expiresIn:"3h"});
-            }
+            // } else {
+                // const token = jwt.sign({email: existingUser.email ,collegeName:existingProfile.collegeName, id: existingUser._id, type:existingUser.type}, secret, {expiresIn:"3h"});
+            // }
             res.json({status:200,message:'Successfully Logged In As Student',result: existingUser,token});
         }else if (existingAdmin) {
             const isPasswordCorrect = await bcrypt.compare(password,existingAdmin.password);
