@@ -47,8 +47,17 @@ export const newApplication = async(req,res) => {
             );
             
         }else{
+            profilee.applications.allApplications.unshift(newApp);
+            profilee.save();
+            
                 // Create
-                new Profile(applicationFields).save().then(async profilee =>  res.json({status:200,profilee}));
+                new Profile(applicationFields).save().then(async profilee =>  {
+                    console.log(profilee);
+                    const profi = await Profile.findOne({user:req.userId});
+                    console.log(profi);
+                    res.json({status:200,profi})
+                }
+                );
             }    
         });
         } catch (error) {
