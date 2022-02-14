@@ -1,26 +1,28 @@
 import Profile from '../models/profile.js';
 import PDFDocument from "pdfkit";
 import cloudinary from '../utils/cloudinary.js'
-
+import Applications from '../models/applications.js';
 //Create New Application For Concession Letter
 export const newApplication = async(req,res) => {
     try {
         const applicationFields = {};
         applicationFields.applications = {};    
-        applicationFields.applications.currentApplication = {};    
+        applicationFields.profile=req.userInfo.profileId;
+        applicationFields.email=req.userInfo.email;
         const {travelOption,startLocation,endLocation,travelPassPeriod} = req.body;
         const result = await cloudinary.uploader.upload(req.file.path);
-        if(travelOption)  applicationFields.applications.currentApplication.travelOption = travelOption;
-        if(startLocation) applicationFields.applications.currentApplication.startLocation = startLocation;
-        if(endLocation) applicationFields.applications.currentApplication.endLocation = endLocation;
-        applicationFields.applications.currentApplication.applicationStatus = 'Under Process';
-        applicationFields.applications.currentApplication.addressProof=result.secure_url;
-        if(travelPassPeriod) applicationFields.applications.currentApplication.travelPassPeriod = travelPassPeriod;
-        applicationFields.applications.currentApplication.appliedOn=Date().toString();
-
+        if(travelOption)  applicationFields.applications.travelOption = travelOption;
+        if(startLocation) applicationFields.applications.startLocation = startLocation;
+        if(endLocation) applicationFields.applications.endLocation = endLocation;
+        applicationFields.applications.applicationStatus = 'Under Process';
+        applicationFields.applications.addressProof=result.secure_url;
+        if(travelPassPeriod) applicationFields.applications.travelPassPeriod = travelPassPeriod;
+        applicationFields.applications.appliedOn=Date().toString();
+        
+        Applications.findOne({profile:req.userInfo.profileId}).then( async application => {  
         // Update
-        Profile.findOne({user:req.userId}).then( async profilee => {  
             const newApp = {
+                // profile:req.userInfo.profileId,
                 travelOption:travelOption,
                 startLocation:startLocation,
                 endLocation:endLocation,
@@ -29,36 +31,22 @@ export const newApplication = async(req,res) => {
                 addressProof:result.secure_url,
                 appliedOn:Date().toString()
             };
-            // Add new app to allApps array
-            profilee.applications.allApplications.unshift(newApp);
-            profilee.save();
-            
-            if(profilee){
-            Profile.findOneAndUpdate(
-                    {user: req.userId},
-                    {$set: applicationFields},
-                    {new: true}
-            ).then( async profilee => {
-                console.log(profilee);
-                const profi = await Profile.findOne({user:req.userId});
-                console.log(profi);
-                res.json({status:200,profi});
-            }
-            );
-            
-        }else{
-            profilee.applications.allApplications.unshift(newApp);
-            profilee.save();
-            
-                // Create
-                new Profile(applicationFields).save().then(async profilee =>  {
-                    console.log(profilee);
-                    const profi = await Profile.findOne({user:req.userId});
-                    console.log(profi);
-                    res.json({status:200,profi})
+            if(application){
+                // Create New Application
+                application.applications.unshift(newApp);
+                application.save().then(async application => {
+                    const applicationn = await Applications.findOne({profile:req.userInfo.profileId});
+                    res.json({status:200,applicationn});
                 }
                 );
-            }    
+            }else{
+                // create First Application
+                new Applications(applicationFields).save().then(async application => {
+                    const applicationn = await Applications.findOne({profile:req.userInfo.profileId});
+                    res.json({status:200,applicationn});
+                })
+            }        
+            // }    
         });
         } catch (error) {
         // console.log(error);
@@ -181,7 +169,7 @@ export const adminverifyProfilee = async(req,res) => {
 // Post Route For User To Submit Profile For Verification
 export const verifyProfile = async(req,res) => {
     try {    
-        Profile.findOne({user:req.userId,profileVerifyApplied:false}).then(profilee => {
+        Profile.findOne({user:req.userId,profileVerifyApplied:false}).then(application => {
         if(profilee){
             Profile.findOneAndUpdate(
                 {user: req.userId},

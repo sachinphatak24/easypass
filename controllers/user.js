@@ -23,7 +23,8 @@ export const signin = async(req,res) => {
             // if (existingProfile === null) {
                 // const token = jwt.sign({email: existingUser.email , id: existingUser._id, type:existingUser.type}, secret, {expiresIn:"3h"});
             // } else {
-                const token = jwt.sign({email: existingUser.email ,collegeName:existingProfile.collegeName, id: existingUser._id, type:existingUser.type}, secret, {expiresIn:"3h"});
+                // console.log(existingProfile._id)
+                const token = jwt.sign({email: existingUser.email ,profileId:existingProfile._id,collegeName:existingProfile.collegeName, id: existingUser._id, type:existingUser.type}, secret, {expiresIn:"3h"});
             // }
             res.json({status:200,message:'Successfully Logged In As Student',result: existingUser,token});
         }else if (existingUser) {
