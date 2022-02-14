@@ -7,6 +7,7 @@ import profile from './profile.js';
 const applicationSchema = mongoose.Schema({
     profile:{type:mongoose.Schema.Types.ObjectId, ref:'Profile'},
     email:{type:String},
+    collegeName:{type:String},
     applications:[
         {
             travelOption:{type:String},

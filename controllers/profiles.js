@@ -2,6 +2,7 @@ import Profile from '../models/profile.js';
 import PDFDocument from "pdfkit";
 import cloudinary from '../utils/cloudinary.js'
 import Applications from '../models/applications.js';
+import profile from '../models/profile.js';
 //Create New Application For Concession Letter
 export const newApplication = async(req,res) => {
     try {
@@ -9,6 +10,7 @@ export const newApplication = async(req,res) => {
         applicationFields.applications = {};    
         applicationFields.profile=req.userInfo.profileId;
         applicationFields.email=req.userInfo.email;
+        applicationFields.collegeName=req.userInfo.collegeName;
         const {travelOption,startLocation,endLocation,travelPassPeriod} = req.body;
         const result = await cloudinary.uploader.upload(req.file.path);
         if(travelOption)  applicationFields.applications.travelOption = travelOption;
@@ -57,13 +59,13 @@ export const newApplication = async(req,res) => {
 //Get Route for Admin to view  Applications requiring Approval
 export const adminGetApp = async(req,res) => {
     try {
-        const unapprovedProfiles = await Profile.find({collegeName:req.userInfo.collegeName,'applications.currentApplication.applicationStatus':'Under Process'});
-        const approveddProfiles = await Profile.find({collegeName:req.userInfo.collegeName,'applications.currentApplication.applicationStatus':'Approved'})
+        const allApplications = await Applications.find({collegeName:req.userInfo.collegeName});
         const userType = req.userInfo.type;
         // console.log(req.userInfo.collegeName);
         // console.log(unapprovedProfiles);
         if(userType ==='college admin'){
-            return res.json({status:200, unapprovedProfiles,approveddProfiles});
+            // return res.json({status:200, unapprovedProfiles,approveddProfiles});
+            return res.json({status:200, allApplications});
         }else{
             res.json({erroMsg:'Need Admin Privilages To Access This Route.'});
         }
@@ -72,25 +74,36 @@ export const adminGetApp = async(req,res) => {
     }
 }
 
-// Post Route For Admin to Verify New Application of Concession Letter 
-export const adminverifyapp = async(req,res) => {
+// Get Route for collegeAdmin to view UnVerified Profiles
+export const adminverifyProfile = async(req,res) => {
     try {
-        Profile.findOne({profileVerifyApplied:true,email:req.body.email,collegeName:req.userInfo.collegeName,profileVerifystatus:'Verified','applications.currentApplication.applicationStatus':'Under Process'}).then(profileToApproove => {
+        const profiles = await Profile.find({profileVerifyApplied:true,collegeName:req.userInfo.collegeName,profileVerifystatus:'UnVerified'});
+        const userType = req.userInfo.type;
+        if(userType ==='college admin'){
+            return res.json({status:200 , profiles});
+        }else{
+            res.json({status:400,erroMsg:'Need Admin Privilages To Access This Route.'});
+        }
+    } catch (error) {
+        res.json({errorMsg:error});
+    }
+}
+
+// Post Route For Admin to Approve New Application of Concession Letter **
+export const adminApproveApp = async(req,res) => {
+    try {
+        Applications.findOne({email:req.body.email,collegeName:req.userInfo.collegeName}).then(profileToApproove => {
             if (profileToApproove) {
-                // return res.json(profileToApproove.applications.allApplications[0].applicationStatus);
-                Profile.findOneAndUpdate(
-                    // {email:req.body.email,'applications.currentApplication.applicationStatus':"Under Process"},
-                    {email:req.body.email,'applications.allApplications.applicationStatus':"Under Process"},
-                    // {email:req.body.email},
-                    {$set:{'applications.currentApplication.applicationStatus':"Approved",'applications.allApplications.$.applicationStatus':"Approved",'applications.allApplications.$.applicationAcceptedOn':Date().toString(),'applications.currentApplication.applicationAcceptedOn':Date().toString()}},
-                    // {$set:{'applications.allApplications.$.applicationStatus':"calm"}},
+                console.log(profileToApproove)
+                Applications.findOneAndUpdate(
+                    {email:req.body.email,'applications.applicationStatus':"Under Process"},
+                    {$set:{'applications.0.applicationStatus':"Approved",'applications.$.applicationAcceptedOn':Date().toString()}},
                     {new: true}
                     ).then( async() => {
-                        const unApprovedProfiles = await Profile.find({'applications.currentApplication.applicationStatus':"Under Process"});
-                        const approveddProfiles = await Profile.find({'applications.currentApplication.applicationStatus':"Approved"});
+                        const allApplications = await Applications.find({collegeName:req.userInfo.collegeName});
                         const userType = req.userInfo.type;
                         if(userType ==='college admin'){
-                           res.json({status:'Successfully Verified!',unApprovedProfiles,approveddProfiles});
+                           res.json({status:'Successfully Approved!',allApplications});
                         }else{
                             res.json({error:'Need Admin Privilages To Access This Route.'});
                         }
@@ -101,11 +114,48 @@ export const adminverifyapp = async(req,res) => {
                    
         })
     } catch (error) {
-        res.json({status:400, message:error});
+        res.json({status:500, message:error});
+    }
+}
+// ==========================================
+// Post Route For Admin to Reject New Application of Concession Letter **
+export const adminRejectApp = async(req,res) => {
+    try {
+        Applications.findOne({email:req.body.email,collegeName:req.userInfo.collegeName}).then(profileToReject => {
+            if (profileToReject) {
+                console.log(profileToReject)
+                Applications.findOneAndUpdate(
+                    {email:req.body.email,'applications.applicationStatus':"Under Process"},
+                    {$set:{'applications.$.applicationStatus':"Rejected"}},
+                    {new: true}
+                    ).then( async() => {
+                        const allApplications = await Applications.find({collegeName:req.userInfo.collegeName});
+                        const userType = req.userInfo.type;
+                        if(userType ==='college admin'){
+                           res.json({status:'Application Successfully Rejected!',allApplications});
+                        }else{
+                            res.json({error:'Need Admin Privilages To Access This Route.'});
+                        }
+                    })
+                } else {
+                res.json({ status:404,error:'There is no Profile to be verified And/Or The profile is already verified And/Or Need Admin Privilages'});
+            }
+                   
+        })
+    } catch (error) {
+        res.json({status:500, message:error});
     }
 }
 
-//Get Route For List Of ALl the Verified Profiles & All the UnVerified Profiles Requiring Verification   
+
+// =========================================
+
+
+
+
+
+
+//Get Route For List Of ALl the Verified Profiles & All the UnVerified Profiles Requiring Verification   **
 export const adminverifyProfileAll = async(req,res) => {
     try {
         const unVerifiedProfiles = await Profile.find({profileVerifyApplied:true,collegeName:req.userInfo.collegeName,profileVerifystatus:'UnVerified'});
@@ -121,13 +171,13 @@ export const adminverifyProfileAll = async(req,res) => {
     }
 }
 
-// Get Route for collegeAdmin to view UnVerified Profiles
-export const adminverifyProfile = async(req,res) => {
+// Get Route for collegeAdmin to view UnVerified Profiles **
+export const adminUnApprovedProfiles = async(req,res) => {
     try {
-        const profiles = await Profile.find({profileVerifyApplied:true,collegeName:req.userInfo.collegeName,profileVerifystatus:'UnVerified'});
+        const unApprovedApplications = await Applications.find({collegeName:req.userInfo.collegeName,'applications.0.applicationStatus':'Under Process'});
         const userType = req.userInfo.type;
         if(userType ==='college admin'){
-            return res.json({status:200 , profiles});
+            return res.json({status:200 , unApprovedApplications});
         }else{
             res.json({status:400,erroMsg:'Need Admin Privilages To Access This Route.'});
         }
@@ -169,7 +219,7 @@ export const adminverifyProfilee = async(req,res) => {
 // Post Route For User To Submit Profile For Verification
 export const verifyProfile = async(req,res) => {
     try {    
-        Profile.findOne({user:req.userId,profileVerifyApplied:false}).then(application => {
+        Profile.findOne({user:req.userId,profileVerifyApplied:false}).then(profilee => {
         if(profilee){
             Profile.findOneAndUpdate(
                 {user: req.userId},
@@ -243,13 +293,39 @@ export const createProfile = async(req,res) => {
 //Get Route to View Current User's Profile
 export const currentProfile = async (req,res) => {
     try{
-        const profile = await Profile.findOne({user:req.userId}).populate('user',['name','type']);
+        const profile = await Applications.findOne({email:req.userInfo.email}).populate('profile');
         if(!profile) return res.json({status:'400',message:'There is no profile for this user. Please Create one at `profile/create`'});
         res.json({status:200,profile});
     } catch(err){
         res.json({status:'500', error:'Server Error'});
     } 
 }
+// ===================================
+
+//Get Route to View Current User's Applications
+export const myApps = async (req,res) => {
+    try{
+        const profile = await Applications.findOne({email:req.userInfo.email});
+        if(!profile) return res.json({status:'400',message:'There is no profile for this user. Please Create one at `profile/create`'});
+        res.json({status:200,profile});
+    } catch(err){
+        res.json({status:'500', error:'Server Error'});
+    } 
+}
+
+// ===================================
+//POST Route to View User's full Profile (Hidden:Admins)
+export const fullProfile = async (req,res) => {
+    try{
+        const profile = await Applications.findOne({email:req.body.email}).populate('profile');
+        if(!profile) return res.json({status:'400',message:'There is no profile for this user. Please Create one at `profile/create`'});
+        res.json({status:200,profile});
+    } catch(err){
+        res.json({status:'500', error:'Server Error'});
+    } 
+}
+// ===================================
+
 
 
 //Download Concession Letter for Approved User Profiles
