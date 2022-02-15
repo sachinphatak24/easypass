@@ -95,7 +95,7 @@ export const newApplication = async(req,res) => {
         if(travelPassPeriod) applicationFields.applications.travelPassPeriod = travelPassPeriod;
         applicationFields.applications.appliedOn=Date().toString();
         
-        Applications.findOne({profile:req.userInfo.profileId}).then( async application => {  
+        Applications.findOne({profile:req.userInfo.profileId,email:req.userInfo.email}).then( async application => {  
             const newApp = {
                 // profile:req.userInfo.profileId,
                 travelOption:travelOption,
@@ -110,18 +110,21 @@ export const newApplication = async(req,res) => {
                 // Create New Application
                 application.applications.unshift(newApp);
                 application.save().then(async application => {
-                    const applicationn = await Applications.findOne({profile:req.userInfo.profileId});
+                    const applicationn = await Applications.findOne({profile:req.userInfo.profileId,email:req.userInfo.email});
                     res.json({status:200,applicationn});
                 }
                 );
             }else{
-                // create First Application
-                new Applications(applicationFields).save().then(async application => {
-                    const applicationn = await Applications.findOne({profile:req.userInfo.profileId});
-                    res.json({status:200,applicationn});
-                })
-            }        
-            // }    
+                if (req.userInfo.collegeName === req.userInfo.profileId) {
+                        res.json({status:401,message:"Please Re-Login & Try Again."});
+                    } else {    
+                        // create First Application
+                        new Applications(applicationFields).save().then(async application => {
+                        const applicationn = await Applications.findOne({profile:req.userInfo.profileId,email:req.userInfo.email});
+                        res.json({status:200,applicationn});
+                    })
+                }        
+            }
         });
         } catch (error) {
         // console.log(error);
