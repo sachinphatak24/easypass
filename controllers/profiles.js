@@ -136,7 +136,7 @@ export const newApplication = async(req,res) => {
 //Get Route to View Current User's Applications
 export const myApps = async (req,res) => {
     try{
-        const profile = await Applications.findOne({email:req.userInfo.email});
+        const profile = await Applications.findOne({email:req.userInfo.email}).populate('profile');
         if(!profile) return res.json({status:'400',message:'There is no profile for this user. Please Create one at `profile/create`'});
         res.json({status:200,profile});
     } catch(err){
