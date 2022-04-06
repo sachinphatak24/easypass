@@ -68,12 +68,13 @@ export const verifyProfile = async(req,res) => {
 //Get Route to View Current User's Profile
 export const currentProfile = async (req,res) => {
     try{
-        const profile = await Applications.findOne({email:req.userInfo.email}).populate('profile');
-        // console.log(req.userInfo.collegeName);
+        const profile = await Profile.findOne({email:req.userInfo.email}).populate('user');
+        console.log(req.userInfo);
+        // console.log(profile);
         if(!profile) return res.json({status:'400',message:'There is no profile for this user. Please Create one at `profile/create`'});
         res.json({status:200,profile});
     } catch(err){
-        res.json({status:'500', error:'Server Error'});
+        res.json({status:'500', error:'Server Error', errorr:err});
     } 
 }
 
