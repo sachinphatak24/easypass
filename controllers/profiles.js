@@ -69,10 +69,15 @@ export const verifyProfile = async(req,res) => {
 export const currentProfile = async (req,res) => {
     try{
         const profile = await Profile.findOne({email:req.userInfo.email}).populate('user');
+        const applications = await Applications.findOne({email:req.userInfo.email});
         console.log(req.userInfo);
         // console.log(profile);
         if(!profile) return res.json({status:'400',message:'There is no profile for this user. Please Create one at `profile/create`'});
-        res.json({status:200,profile});
+        if(profile && applications){
+            res.json({status:200,profile,applications});
+        }else if(!applications){
+            res.json({status:201,message:"No Applications Created Yet." ,profile});
+        }
     } catch(err){
         res.json({status:'500', error:'Server Error', errorr:err});
     } 
