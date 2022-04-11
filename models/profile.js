@@ -3,7 +3,6 @@ import  mongoose from 'mongoose';
 import User from './user.js';
 const profileSchema = mongoose.Schema({
     user:{type: mongoose.Schema.Types.ObjectId,ref:'User'},
-    applications:{type: mongoose.Schema.Types.ObjectId,ref:'aplications'},
     email:{type:String,ref:'User',required:true},
     nameAsPerIdCard:{type:String,required:true},
     dateOfBirth:{type:String,required:true},
@@ -17,7 +16,30 @@ const profileSchema = mongoose.Schema({
     profileVerifyApplied:{ type: Boolean, default: false },
     profileVerifystatus:{type:String,default:"UnVerified"},
     profileVerifyDate:{type:String},
-    passinfo:[{
+    applications:{
+        currentApplication:{
+            applicationAcceptedOn:{type:String},
+            applicationStatus:{type:String},
+            appliedOn:{type:String},
+            travelOption:{type:String},
+            startLocation:{type:String},
+            endLocation:{type:String},
+            travelPassPeriod:{type:String},
+            addressProof:{type:String}
+        },
+        allApplications:[
+        {
+            travelOption:{type:String},
+            startLocation:{type:String},
+            endLocation:{type:String},
+            travelPassPeriod:{type:String},
+            applicationStatus:{type:String},
+            appliedOn:{type:String},
+            addressProof:{type:String},
+            applicationAcceptedOn:{type:String}
+        }],
+    },
+        passinfo:[{
         passType:{type:String},
         passVerifyStatus:{type:String,default:'UnVerified'},
         passApproveStatus:{type:String,default:'UnApproved'},
