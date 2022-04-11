@@ -7,7 +7,8 @@ import authenticate from '../middleware/authentication.js';
 import upload from '../utils/multer.js';
 // =========================================================
 
-import {allProfiles, verifyProfile, adminverifyProfile, adminverifyProfilee, createProfile, currentProfile, adminverifyProfileAll, newApplication, pdfGen, adminGetApp, fullProfile, adminUnApprovedProfiles, myApps, adminRejectApp, adminApproveApp, allUsers} from '../controllers/profiles.js';
+// myApps
+import {allProfiles, verifyProfile, adminverifyProfile, adminverifyProfilee, createProfile, currentProfile, adminverifyProfileAll, newApplication, pdfGen, adminGetApp, fullProfile, adminUnApprovedProfiles, adminRejectApp, adminApproveApp, allUsers} from '../controllers/profiles.js';
 
 //GET ROUTES:-
 
@@ -17,7 +18,7 @@ import {allProfiles, verifyProfile, adminverifyProfile, adminverifyProfilee, cre
 router.get('/current',authenticate, currentProfile);
 
 // Current User's Applications(Hidden:Current User)
-router.get('/myapps',authenticate, myApps);
+// router.get('/myapps',authenticate, myApps);
 
 //-----------------------ADMIN ROUTES--------------------------
 
