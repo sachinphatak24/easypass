@@ -270,10 +270,28 @@ export const adminUnApprovedProfiles = async(req,res) => {
 export const adminGetApp = async(req,res) => {
     try {
         const unapprovedProfiles = await Profile.find({collegeName:req.userInfo.collegeName,'applications.currentApplication.applicationStatus':'Under Process'});
-        const approveddProfiles = await Profile.find({collegeName:req.userInfo.collegeName,'applications.currentApplication.applicationStatus':'Approved'})
+        const approveddProfiles = await Profile.find({collegeName:req.userInfo.collegeName,'applications.currentApplication.applicationStatus':'Approved'});
         const userType = req.userInfo.type;
         if(userType ==='college admin'){
+            // console.log(unapprovedProfiles);
+            // console.log(approveddProfiles[0].applications);
+            // const element = [];
+            // let app = [];
+            // for (let i = 0; i < unapprovedProfiles.length; i++) {
+                // app.push(unapprovedProfiles[i].applications.currentApplication,unapprovedProfiles[i].email);
+                // app.push(unapprovedProfiles[i].email);
+                // app.push(unapprovedProfiles[i].nameAsPerIdCard);
+                // console.log(app);
+                // element.push(app);
+                // element.push(unapprovedProfiles[i].);
+                // }
+                // console.log(app);
+                // const apps = await unapprovedProfiles[0].applications.currentApplication;
+                // console.log(unapprovedProfiles.length);
+                // console.log(element);
+            // console.log(approveddProfiles.length);
             return res.json({status:200, unapprovedProfiles,approveddProfiles});
+            // return res.json({status:200, apps});
         }else{
             res.json({erroMsg:'Need Admin Privilages To Access This Route.'});
         }
