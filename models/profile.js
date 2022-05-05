@@ -14,7 +14,7 @@ const profileSchema = mongoose.Schema({
     location:{type:String},
     date:{type:String, default: Date().toString()},
     profileVerifyApplied:{ type: Boolean, default: false },
-    profileVerifystatus:{type:String,default:"UnVerified"},
+    profileVerifystatus:{type:String, default:"UnVerified"},
     profileVerifyDate:{type:String},
     applications:{
         currentApplication:{
@@ -22,18 +22,24 @@ const profileSchema = mongoose.Schema({
             email:{type:String},
 
             applicationAcceptedOn:{type:String},
+            applicationRejectedOn:{type:String},
             applicationStatus:{type:String},
             appliedOn:{type:String},
             travelOption:{type:String},
             startLocation:{type:String},
             endLocation:{type:String},
             travelPassPeriod:{type:String},
-            addressProof:{type:String}
+            addressProof:{type:String},
+            
+            amount:{type:String},
+            amountPaid:{type:Boolean, default:false}
+
         },
         allApplications:[
         {
             name:{type:String},
             email:{type:String},
+
             travelOption:{type:String},
             startLocation:{type:String},
             endLocation:{type:String},
@@ -41,7 +47,11 @@ const profileSchema = mongoose.Schema({
             applicationStatus:{type:String},
             appliedOn:{type:String},
             addressProof:{type:String},
-            applicationAcceptedOn:{type:String}
+            applicationRejectedOn:{type:String},
+            applicationAcceptedOn:{type:String},
+            
+            amount:{type:String},
+            amountPaid:{type:Boolean, default:false}
         }],
     },
         passinfo:[{

@@ -151,16 +151,93 @@ export const newApplication = async(req,res) => {
 }
 
 
-// //Get Route to View Current User's Applications
-// export const myApps = async (req,res) => {
-//     try{
-//         const profile = await Applications.findOne({email:req.userInfo.email}).populate('profile');
-//         if(!profile) return res.json({status:'400',message:'There is no profile for this user. Please Create one at `profile/create`'});
-//         res.json({status:200,profile});
-//     } catch(err){
-//         res.json({status:'500', error:'Server Error'});
-//     } 
-// }
+//Get Route to View Current User's Applications
+export const myApps = async (req,res) => {
+    try{
+        const profile = await Profile.findOne({email:req.userInfo.email}).populate('user');
+        if(!profile) return res.json({status:'400',message:'There is no profile for this user. Please Create one at `profile/create`'});
+        const origin = profile.applications.currentApplication.startLocation; 
+        // const dest = profile.applications.currentApplication.endLocation;
+        const period = profile.applications.currentApplication.travelPassPeriod;
+        // console.log(dest,origin); 
+        // console.log(profile); 
+        let amountToPay; 
+        if (origin == 'Ghorawadi' || origin == 'Begdewadi' || origin =='Dehu Road' || origin == 'Vadgaon') {
+            if (period == '1 month'){
+                amountToPay = '60'
+            }else if(period == '3 months'){
+                amountToPay = '160';
+            }else if(period == '6 months'){
+                amountToPay = '280';
+            }    
+            Profile.findOneAndUpdate(
+                {email:req.userInfo.email,'applications.currentApplication.applicationStatus':"Approved"},
+                {$set: {'applications.currentApplication.amount':amountToPay, 'applications.allApplications.0.amount':amountToPay}},
+                {new: true}).then(
+                    async() => {
+                        const myApp = await Profile.findOne({email:req.userInfo.email}).populate('user');
+                        res.json({status:201,message:'wah',myApp});
+                    })
+        }else if(origin == 'Akurdi' || origin == 'Chinchwad' || origin =='Pimpri' || origin == 'Kamshet' || origin == 'Kanhe') {
+            // let amountToPay; 
+            if (period == '1 month'){
+                amountToPay = '90'
+            }else if(period == '3 months'){
+                amountToPay = '210';
+            }else if(period == '6 months'){
+                amountToPay = '380';
+            }    
+            Profile.findOneAndUpdate(
+                {email:req.userInfo.email,'applications.currentApplication.applicationStatus':"Approved"},
+                {$set: {'applications.currentApplication.amount':amountToPay, 'applications.allApplications.0.amount':amountToPay}},
+                {new: true}).then(
+                    async() => {
+                        const myApp = await Profile.findOne({email:req.userInfo.email}).populate('user');
+                        res.json({status:201,message:'wah',myApp});
+                    })
+        }else if(origin == 'Kasarwasi' || origin == 'Dapodi' || origin == 'khadki' || origin == 'Malavli') {
+            // let amountToPay; 
+            if (period == '1 month'){
+                amountToPay = '130'
+            }else if(period == '3 months'){
+                amountToPay = '245';
+            }else if(period == '6 months'){
+                amountToPay = '480';
+            }     
+            Profile.findOneAndUpdate(
+                {email:req.userInfo.email,'applications.currentApplication.applicationStatus':"Approved"},
+                {$set: {'applications.currentApplication.amount':amountToPay, 'applications.allApplications.0.amount':amountToPay}},
+                {new: true}).then(
+                    async() => {
+                        const myApp = await Profile.findOne({email:req.userInfo.email}).populate('user');
+                        res.json({status:201,message:'wah',myApp});
+                    })
+        }else if(origin == 'Pune' || origin == 'Shivajinagar' || origin =='Lonawala') {
+            // let amountToPay; 
+            if (period == '1 month'){
+                amountToPay = '160'
+            }else if(period == '3 months'){
+                amountToPay = '320';
+            }else if(period == '6 months'){
+                amountToPay = '515';
+            }  
+            Profile.findOneAndUpdate(
+                {email:req.userInfo.email,'applications.currentApplication.applicationStatus':"Approved"},
+                {$set: {'applications.currentApplication.amount':amountToPay, 'applications.allApplications.0.amount':amountToPay}},
+                {new: true}).then(
+                    async() => {
+                        const myApp = await Profile.findOne({email:req.userInfo.email}).populate('user');
+                        res.json({status:201,message:'wah',myApp});
+                    })
+        }else{
+            res.json({status:200,profile});
+        }
+
+        // res.json({status:200,profile});
+    } catch(err){
+        res.json({status:'500', error:'Server Error'});
+    } 
+}
 
 
 //-----------------------ADMIN ROUTES--------------------------
@@ -324,11 +401,31 @@ export const adminApproveApp = async(req,res) => {
                     // {$set:{'applications.allApplications.$.applicationStatus':"calm"}},
                     {new: true}
                     ).then( async() => {
-                        const unApprovedProfiles = await Profile.find({'applications.currentApplication.applicationStatus':"Under Process"});
-                        const approveddProfiles = await Profile.find({'applications.currentApplication.applicationStatus':"Approved"});
+                        const unapprovedProfiles = await Profile.find({'applications.currentApplication.applicationStatus':"Under Process"});
+                        const approvedProfiles = await Profile.find({'applications.currentApplication.applicationStatus':"Approved"});
                         const userType = req.userInfo.type;
                         if(userType ==='college admin'){
-                           res.json({status:'Successfully Verified!',unApprovedProfiles,approveddProfiles});
+                            let unapprovedApps = [];
+                            for (let i = 0; i < unapprovedProfiles.length; i++) {
+                            unapprovedApps.push(unapprovedProfiles[i].applications.currentApplication);
+                        }
+                        let approvedApps = [];
+                        var promises = [];
+                        for (let i = 0; i < approvedProfiles.length; i++) {
+                            promises.push(
+                                new Promise((resolve, reject) => {
+                                    for(let j= 0; j<approvedProfiles[i].applications.allApplications.length; j++){
+                                        if(approvedProfiles[i].applications.allApplications[j].applicationStatus=="Approved")
+                                        approvedApps.push(approvedProfiles[i].applications.allApplications[j]);
+                                        resolve()
+                                    }
+                                })
+                            )
+                        }
+                        Promise.all(promises).then(() => {
+                            return res.json({status:200,message:'Successfully Approved!', unapprovedApps,approvedApps});
+                        })
+                        //    res.json({status:'Successfully Verified!',unApprovedProfiles,approveddProfiles});
                         }else{
                             res.json({error:'Need Admin Privilages To Access This Route.'});
                         }
@@ -346,18 +443,39 @@ export const adminApproveApp = async(req,res) => {
 // Post Route For Admin to Reject New Application of Concession Letter **
 export const adminRejectApp = async(req,res) => {
     try {
-        Applications.findOne({email:req.body.email,collegeName:req.userInfo.collegeName}).then(profileToReject => {
+        Profile.findOne({email:req.body.email,collegeName:req.userInfo.collegeName}).then(profileToReject => {
             if (profileToReject) {
                 // console.log(profileToReject)
-                Applications.findOneAndUpdate(
-                    {email:req.body.email,'applications.applicationStatus':"Under Process"},
-                    {$set:{'applications.$.applicationStatus':"Rejected"}},
+                Profile.findOneAndUpdate(
+                    {email:req.body.email,'applications.allApplications.applicationStatus':"Under Process"},
+                    {$set:{'applications.currentApplication.applicationStatus':"Rejected",'applications.allApplications.$.applicationStatus':"Rejected",'applications.allApplications.$.applicationRejectedOn':Date().toString(),'applications.currentApplication.applicationRejectedOn':Date().toString()}},
                     {new: true}
                     ).then( async() => {
-                        const allApplications = await Applications.find({collegeName:req.userInfo.collegeName});
+                        const unapprovedProfiles = await Profile.find({'applications.currentApplication.applicationStatus':"Under Process"});
+                        const approvedProfiles = await Profile.find({'applications.currentApplication.applicationStatus':"Approved"});
                         const userType = req.userInfo.type;
                         if(userType ==='college admin'){
-                           res.json({status:'Application Successfully Rejected!',allApplications});
+                            let unapprovedApps = [];
+                            for (let i = 0; i < unapprovedProfiles.length; i++) {
+                            unapprovedApps.push(unapprovedProfiles[i].applications.currentApplication);
+                        }
+                        let approvedApps = [];
+                        var promises = [];
+                        for (let i = 0; i < approvedProfiles.length; i++) {
+                            promises.push(
+                                new Promise((resolve, reject) => {
+                                    for(let j= 0; j<approvedProfiles[i].applications.allApplications.length; j++){
+                                        if(approvedProfiles[i].applications.allApplications[j].applicationStatus=="Approved")
+                                        approvedApps.push(approvedProfiles[i].applications.allApplications[j]);
+                                        resolve()
+                                    }
+                                })
+                            )
+                        }
+                        Promise.all(promises).then(() => {
+                            return res.json({status:200,message:'Successfully Rejected!', unapprovedApps,approvedApps});
+                        })
+                        //    res.json({status:'Successfully Verified!',unApprovedProfiles,approveddProfiles});
                         }else{
                             res.json({error:'Need Admin Privilages To Access This Route.'});
                         }
