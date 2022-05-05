@@ -18,6 +18,9 @@ const profileSchema = mongoose.Schema({
     profileVerifyDate:{type:String},
     applications:{
         currentApplication:{
+            name:{type:String},
+            email:{type:String},
+
             applicationAcceptedOn:{type:String},
             applicationStatus:{type:String},
             appliedOn:{type:String},
@@ -29,6 +32,8 @@ const profileSchema = mongoose.Schema({
         },
         allApplications:[
         {
+            name:{type:String},
+            email:{type:String},
             travelOption:{type:String},
             startLocation:{type:String},
             endLocation:{type:String},
