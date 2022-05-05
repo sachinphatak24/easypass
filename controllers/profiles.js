@@ -88,6 +88,10 @@ export const newApplication = async(req,res) => {
         if(travelOption)  applicationFields.applications.currentApplication.travelOption = travelOption;
         if(startLocation) applicationFields.applications.currentApplication.startLocation = startLocation;
         if(endLocation) applicationFields.applications.currentApplication.endLocation = endLocation;
+        
+        applicationFields.applications.currentApplication.name = req.userInfo.name;
+        applicationFields.applications.currentApplication.email = req.userInfo.email;
+
         applicationFields.applications.currentApplication.applicationStatus = 'Under Process';
         applicationFields.applications.currentApplication.addressProof=result.secure_url;
         if(travelPassPeriod) applicationFields.applications.currentApplication.travelPassPeriod = travelPassPeriod;
@@ -96,13 +100,19 @@ export const newApplication = async(req,res) => {
         // Update
         Profile.findOne({user:req.userId}).then( async profilee => {  
             const newApp = {
+
+                name:req.userInfo.name,
+                email:req.userInfo.email,
+
                 travelOption:travelOption,
                 startLocation:startLocation,
                 endLocation:endLocation,
                 travelPassPeriod:travelPassPeriod,
                 applicationStatus:"Under Process",
                 addressProof:result.secure_url,
-                appliedOn:Date().toString()
+                appliedOn:Date().toString(),
+
+
             };
             // Add new app to allApps array
             profilee.applications.allApplications.unshift(newApp);
@@ -270,10 +280,29 @@ export const adminUnApprovedProfiles = async(req,res) => {
 export const adminGetApp = async(req,res) => {
     try {
         const unapprovedProfiles = await Profile.find({collegeName:req.userInfo.collegeName,'applications.currentApplication.applicationStatus':'Under Process'});
-        const approveddProfiles = await Profile.find({collegeName:req.userInfo.collegeName,'applications.currentApplication.applicationStatus':'Approved'})
+        const approvedProfiles = await Profile.find({collegeName:req.userInfo.collegeName,'applications.allApplications.applicationStatus':'Approved'});
         const userType = req.userInfo.type;
         if(userType ==='college admin'){
-            return res.json({status:200, unapprovedProfiles,approveddProfiles});
+            let unapprovedApps = [];
+            for (let i = 0; i < unapprovedProfiles.length; i++) {
+                unapprovedApps.push(unapprovedProfiles[i].applications.currentApplication);
+            }
+            let approvedApps = [];
+            var promises = [];
+            for (let i = 0; i < approvedProfiles.length; i++) {
+                promises.push(
+                    new Promise((resolve, reject) => {
+                        for(let j= 0; j<approvedProfiles[i].applications.allApplications.length; j++){
+                            if(approvedProfiles[i].applications.allApplications[j].applicationStatus=="Approved")
+                            approvedApps.push(approvedProfiles[i].applications.allApplications[j]);
+                            resolve()
+                        }
+                    })
+                    )
+                }
+                Promise.all(promises).then(() => {
+                    return res.json({status:200, unapprovedApps,approvedApps});
+                })
         }else{
             res.json({erroMsg:'Need Admin Privilages To Access This Route.'});
         }
