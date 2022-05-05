@@ -1,7 +1,6 @@
 import Profile from '../models/profile.js';
 import PDFDocument from "pdfkit";
 import cloudinary from '../utils/cloudinary.js'
-import Applications from '../models/applications.js';
 import User from '../models/user.js';
 
 
