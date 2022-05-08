@@ -3,6 +3,13 @@ import PDFDocument from "pdfkit";
 import cloudinary from '../utils/cloudinary.js'
 import User from '../models/user.js';
 
+// import Razorpay from 'razorpay'; 
+
+// ==========================
+// export const paymentRoute = async(req,res)=>{
+
+// }
+
 
 //-----------------------USER ROUTES--------------------------
 
@@ -341,7 +348,7 @@ export const adminverifyProfilee = async(req,res) => {
 // Get Route for collegeAdmin To View Only UnApproved Applications **
 export const adminUnApprovedProfiles = async(req,res) => {
     try {
-        const unapprovedProfiles = await Profile.find({collegeName:req.userInfo.collegeName,'applications.currentApplication.applicationStatus':'Under Process'});
+        const unapprovedRailProfiles = await Profile.find({collegeName:req.userInfo.collegeName,'applications.currentApplication.applicationStatus':'Under Process'});
         const userType = req.userInfo.type;
         if(userType ==='college admin'){
             return res.json({status:200, unapprovedProfiles});
@@ -501,6 +508,78 @@ export const fullProfile = async (req,res) => {
     } 
 }
 
+
+// --------------------RAILWAY ADMIN ROUTE---------------------
+export const railwayPases = async(req,res) => {
+    try {
+        const unapprovedRailProfiles = await Profile.find({'applications.currentApplication.travelOption':'Local / Train','applications.currentApplication.applicationStatus':'Under Process'});
+        const approvedRailProfiles = await Profile.find({'applications.currentApplication.travelOption':'Local / Train','applications.allApplications.applicationStatus':'Approved'});
+        const userType = req.userInfo.type;
+        if(userType === 'bus admin' || userType==='college admin' || userType==='railway admin'){
+            let unapprovedRailApps = [];
+            for (let i = 0; i < unapprovedRailProfiles.length; i++) {
+                unapprovedRailApps.push(unapprovedRailProfiles[i].applications.currentApplication);
+            }
+            let approvedRailApps = [];
+            var promises = [];
+            for (let i = 0; i < approvedRailProfiles.length; i++) {
+                promises.push(
+                    new Promise((resolve, reject) => {
+                        for(let j= 0; j<approvedRailProfiles[i].applications.allApplications.length; j++){
+                            if(approvedRailProfiles[i].applications.allApplications[j].applicationStatus=="Approved")
+                            approvedRailApps.push(approvedRailProfiles[i].applications.allApplications[j]);
+                            resolve()
+                        }
+                    })
+                    )
+                }
+                Promise.all(promises).then(() => {
+                    return res.json({status:200, unapprovedRailApps,approvedRailApps});
+                })
+        }else{
+            res.json({erroMsg:'Need Admin Privilages To Access This Route.'});
+        }
+    } catch (error) {
+        res.json({errorMsg:error});
+    }
+}
+
+
+
+// --------------------BUS ADMIN ROUTE---------------------
+export const busPases = async(req,res) => {
+    try {
+        const unapprovedBusProfiles = await Profile.find({'applications.currentApplication.travelOption':'PMPML / Bus','applications.currentApplication.applicationStatus':'Under Process'});
+        const approvedBusProfiles = await Profile.find({'applications.currentApplication.travelOption':'PMPML / Bus','applications.allApplications.applicationStatus':'Approved'});
+        const userType = req.userInfo.type;
+        if(userType === 'bus admin' || userType==='college admin' || userType==='railway admin'){
+            let unapprovedBusApps = [];
+            for (let i = 0; i < unapprovedBusProfiles.length; i++) {
+                unapprovedBusApps.push(unapprovedBusProfiles[i].applications.currentApplication);
+            }
+            let approvedBusApps = [];
+            var promises = [];
+            for (let i = 0; i < approvedBusProfiles.length; i++) {
+                promises.push(
+                    new Promise((resolve, reject) => {
+                        for(let j= 0; j<approvedBusProfiles[i].applications.allApplications.length; j++){
+                            if(approvedBusProfiles[i].applications.allApplications[j].applicationStatus=="Approved")
+                            approvedBusApps.push(approvedBusProfiles[i].applications.allApplications[j]);
+                            resolve()
+                        }
+                    })
+                    )
+                }
+                Promise.all(promises).then(() => {
+                    return res.json({status:200, unapprovedBusApps,approvedBusApps});
+                })
+        }else{
+            res.json({erroMsg:'Need Admin Privilages To Access This Route.'});
+        }
+    } catch (error) {
+        res.json({errorMsg:error});
+    }
+}
 
 //Download Concession Letter for Approved User Profiles
 export const pdfGen = async (req, res) => {
