@@ -122,7 +122,7 @@ export const currentProfile = async (req,res) => {
                             const myApp = await Profile.findOne({email:req.userInfo.email}).populate('user');
                             res.json({status:201,message:'wah',myApp});
                         })
-            }else if(origin == 'Kasarwasi' || origin == 'Dapodi' || origin == 'khadki' || origin == 'Malavli') {
+            }else if(origin == 'Kasarwadi' || origin == 'Dapodi' || origin == 'khadki' || origin == 'Malavli') {
                 // let amountToPay; 
                 if (period == '1 month'){
                     amountToPay = '130'
@@ -232,6 +232,8 @@ export const currentProfile = async (req,res) => {
                 res.json({status:200,profile});
             }
 
+        }else{
+            res.json({status:200,profile});
         }
     } catch(err){
         res.json({status:'500', error:'Server Error'});
