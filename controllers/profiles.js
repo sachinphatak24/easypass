@@ -77,7 +77,83 @@ export const currentProfile = async (req,res) => {
     try{
         const profile = await Profile.findOne({user:req.userId}).populate('user');
         if(!profile) return res.json({status:'400',message:'There is no profile for this user. Please Create one at `profile/create`'});
-        res.json({status:200,profile});
+        // res.json({status:200,profile});
+        const origin = profile.applications.currentApplication.startLocation; 
+        // const dest = profile.applications.currentApplication.endLocation;
+        const period = profile.applications.currentApplication.travelPassPeriod;
+        // console.log(dest,origin); 
+        // console.log(profile); 
+        let amountToPay; 
+        if (origin == 'Ghorawadi' || origin == 'Begdewadi' || origin =='Dehu Road' || origin == 'Vadgaon') {
+            if (period == '1 month'){
+                amountToPay = '60'
+            }else if(period == '3 months'){
+                amountToPay = '160';
+            }else if(period == '6 months'){
+                amountToPay = '280';
+            }    
+            Profile.findOneAndUpdate(
+                {email:req.userInfo.email,'applications.currentApplication.applicationStatus':"Approved"},
+                {$set: {'applications.currentApplication.amount':amountToPay, 'applications.allApplications.0.amount':amountToPay}},
+                {new: true}).then(
+                    async() => {
+                        const myApp = await Profile.findOne({email:req.userInfo.email}).populate('user');
+                        res.json({status:201,message:'wah',myApp});
+                    })
+        }else if(origin == 'Akurdi' || origin == 'Chinchwad' || origin =='Pimpri' || origin == 'Kamshet' || origin == 'Kanhe') {
+            // let amountToPay; 
+            if (period == '1 month'){
+                amountToPay = '90'
+            }else if(period == '3 months'){
+                amountToPay = '210';
+            }else if(period == '6 months'){
+                amountToPay = '380';
+            }    
+            Profile.findOneAndUpdate(
+                {email:req.userInfo.email,'applications.currentApplication.applicationStatus':"Approved"},
+                {$set: {'applications.currentApplication.amount':amountToPay, 'applications.allApplications.0.amount':amountToPay}},
+                {new: true}).then(
+                    async() => {
+                        const myApp = await Profile.findOne({email:req.userInfo.email}).populate('user');
+                        res.json({status:201,message:'wah',myApp});
+                    })
+        }else if(origin == 'Kasarwasi' || origin == 'Dapodi' || origin == 'khadki' || origin == 'Malavli') {
+            // let amountToPay; 
+            if (period == '1 month'){
+                amountToPay = '130'
+            }else if(period == '3 months'){
+                amountToPay = '245';
+            }else if(period == '6 months'){
+                amountToPay = '480';
+            }     
+            Profile.findOneAndUpdate(
+                {email:req.userInfo.email,'applications.currentApplication.applicationStatus':"Approved"},
+                {$set: {'applications.currentApplication.amount':amountToPay, 'applications.allApplications.0.amount':amountToPay}},
+                {new: true}).then(
+                    async() => {
+                        const myApp = await Profile.findOne({email:req.userInfo.email}).populate('user');
+                        res.json({status:201,message:'wah',myApp});
+                    })
+        }else if(origin == 'Pune' || origin == 'Shivajinagar' || origin =='Lonawala') {
+            // let amountToPay; 
+            if (period == '1 month'){
+                amountToPay = '160'
+            }else if(period == '3 months'){
+                amountToPay = '320';
+            }else if(period == '6 months'){
+                amountToPay = '515';
+            }  
+            Profile.findOneAndUpdate(
+                {email:req.userInfo.email,'applications.currentApplication.applicationStatus':"Approved"},
+                {$set: {'applications.currentApplication.amount':amountToPay, 'applications.allApplications.0.amount':amountToPay}},
+                {new: true}).then(
+                    async() => {
+                        const myApp = await Profile.findOne({email:req.userInfo.email}).populate('user');
+                        res.json({status:201,message:'wah',myApp});
+                    })
+        }else{
+            res.json({status:200,profile});
+        }
     } catch(err){
         res.json({status:'500', error:'Server Error'});
     } 
