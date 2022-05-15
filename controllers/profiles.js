@@ -80,7 +80,7 @@ export const currentProfile = async (req,res) => {
         // res.json({status:200,profile});
         const origin = profile.applications.currentApplication.startLocation; 
         // const dest = profile.applications.currentApplication.endLocation;
-        const period = profile.applications.currentApplication.travelPassPeriod;
+        const period = profile.applications.currentApplication.travelPassPeriod.toLowerCase();
 
         const via = profile.applications.currentApplication.travelOption;
 
