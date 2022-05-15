@@ -78,168 +78,168 @@ export const currentProfile = async (req,res) => {
         // console.log("cool");
         const profile = await Profile.findOne({user:req.userId}).populate('user');
         if(!profile) return res.json({status:'400',message:'There is no profile for this user. Please Create one at `profile/create`'});
-        // res.json({status:200,profile});
-        const origin = profile.applications.currentApplication.startLocation;
-        if(origin){
+        res.json({status:200,profile});
+        // const origin = profile.applications.currentApplication.startLocation;
+        // if(origin){
 
-            // const dest = profile.applications.currentApplication.endLocation;
-            const period = profile.applications.currentApplication.travelPassPeriod.toLowerCase();
+        //     // const dest = profile.applications.currentApplication.endLocation;
+        //     const period = profile.applications.currentApplication.travelPassPeriod.toLowerCase();
             
-            const via = profile.applications.currentApplication.travelOption;
-            // console.log(dest,origin); 
-            // console.log(profile); 
-            if(via == "Local / Train"){
+        //     const via = profile.applications.currentApplication.travelOption;
+        //     // console.log(dest,origin); 
+        //     // console.log(profile); 
+        //     if(via == "Local / Train"){
                 
-                let amountToPay; 
-                if (origin == 'Ghorawadi' || origin == 'Begdewadi' || origin =='Dehu Road' || origin == 'Vadgaon') {
-                    if (period == '1 month'){
-                    amountToPay = '60'
-                }else if(period == '3 months'){
-                    amountToPay = '160';
-                }else if(period == '6 months'){
-                    amountToPay = '280';
-                }    
-                Profile.findOneAndUpdate(
-                    {email:req.userInfo.email,'applications.currentApplication.applicationStatus':"Approved"},
-                    {$set: {'applications.currentApplication.amount':amountToPay, 'applications.allApplications.0.amount':amountToPay}},
-                    {new: true}).then(
-                        async() => {
-                            const myApp = await Profile.findOne({email:req.userInfo.email}).populate('user');
-                            res.json({status:200,myApp});
-                        })
-            }else if(origin == 'Akurdi' || origin == 'Chinchwad' || origin =='Pimpri' || origin == 'Kamshet' || origin == 'Kanhe') {
-                // let amountToPay; 
-                if (period == '1 month'){
-                    amountToPay = '90'
-                }else if(period == '3 months'){
-                    amountToPay = '210';
-                }else if(period == '6 months'){
-                    amountToPay = '380';
-                }    
-                Profile.findOneAndUpdate(
-                    {email:req.userInfo.email,'applications.currentApplication.applicationStatus':"Approved"},
-                    {$set: {'applications.currentApplication.amount':amountToPay, 'applications.allApplications.0.amount':amountToPay}},
-                    {new: true}).then(
-                        async() => {
-                            const myApp = await Profile.findOne({email:req.userInfo.email}).populate('user');
-                            res.json({status:200,myApp});
-                        })
-            }else if(origin == 'Kasarwadi' || origin == 'Dapodi' || origin == 'khadki' || origin == 'Malavli') {
-                // let amountToPay; 
-                if (period == '1 month'){
-                    amountToPay = '130'
-                }else if(period == '3 months'){
-                    amountToPay = '245';
-                }else if(period == '6 months'){
-                    amountToPay = '480';
-                }     
-                Profile.findOneAndUpdate(
-                    {email:req.userInfo.email,'applications.currentApplication.applicationStatus':"Approved"},
-                    {$set: {'applications.currentApplication.amount':amountToPay, 'applications.allApplications.0.amount':amountToPay}},
-                    {new: true}).then(
-                        async() => {
-                            const myApp = await Profile.findOne({email:req.userInfo.email}).populate('user');
-                            res.json({status:200,myApp});
-                        })
-            }else if(origin == 'Pune' || origin == 'Shivajinagar' || origin =='Lonawala') {
-                // let amountToPay; 
-                if (period == '1 month'){
-                    amountToPay = '160'
-                }else if(period == '3 months'){
-                    amountToPay = '320';
-                }else if(period == '6 months'){
-                    amountToPay = '515';
-                }  
-                Profile.findOneAndUpdate(
-                    {email:req.userInfo.email,'applications.currentApplication.applicationStatus':"Approved"},
-                    {$set: {'applications.currentApplication.amount':amountToPay, 'applications.allApplications.0.amount':amountToPay}},
-                    {new: true}).then(
-                        async() => {
-                            const myApp = await Profile.findOne({email:req.userInfo.email}).populate('user');
-                            res.json({status:200,myApp});
-                        })
-            }else{
-                res.json({status:200,profile});
-            }
-            }else if(via == "PMPML / Bus"){
-            let amountToPay; 
-            if (origin == 'Ghorawadi' || origin == 'Begdewadi' || origin =='Dehu Road' || origin == 'Vadgaon') {
-                if (period == '1 month'){
-                    amountToPay = '90'
-                }else if(period == '3 months'){
-                    amountToPay = '180';
-                }else if(period == '6 months'){
-                    amountToPay = '300';
-                }    
-                Profile.findOneAndUpdate(
-                    {email:req.userInfo.email,'applications.currentApplication.applicationStatus':"Approved"},
-                    {$set: {'applications.currentApplication.amount':amountToPay, 'applications.allApplications.0.amount':amountToPay}},
-                    {new: true}).then(
-                        async() => {
-                            const myApp = await Profile.findOne({email:req.userInfo.email}).populate('user');
-                            res.json({status:200,myApp});
-                        })
-            }else if(origin == 'Akurdi' || origin == 'Chinchwad' || origin =='Pimpri' || origin == 'Kamshet' || origin == 'Kanhe') {
-                // let amountToPay; 
-                if (period == '1 month'){
-                    amountToPay = '110'
-                }else if(period == '3 months'){
-                    amountToPay = '230';
-                }else if(period == '6 months'){
-                    amountToPay = '400';
-                }    
-                Profile.findOneAndUpdate(
-                    {email:req.userInfo.email,'applications.currentApplication.applicationStatus':"Approved"},
-                    {$set: {'applications.currentApplication.amount':amountToPay, 'applications.allApplications.0.amount':amountToPay}},
-                    {new: true}).then(
-                        async() => {
-                            const myApp = await Profile.findOne({email:req.userInfo.email}).populate('user');
-                            res.json({status:200,myApp});
-                        })
-            }else if(origin == 'Kasarwadi' || origin == 'Dapodi' || origin == 'khadki' || origin == 'Malavli') {
-                // let amountToPay; 
-                if (period == '1 month'){
-                    amountToPay = '150'
-                }else if(period == '3 months'){
-                    amountToPay = '265';
-                }else if(period == '6 months'){
-                    amountToPay = '500';
-                }     
-                Profile.findOneAndUpdate(
-                    {email:req.userInfo.email,'applications.currentApplication.applicationStatus':"Approved"},
-                    {$set: {'applications.currentApplication.amount':amountToPay, 'applications.allApplications.0.amount':amountToPay}},
-                    {new: true}).then(
-                        async() => {
-                            const myApp = await Profile.findOne({email:req.userInfo.email}).populate('user');
-                            res.json({status:200,myApp});
-                        })
-            }else if(origin == 'Pune' || origin == 'Shivajinagar' || origin =='Lonawala') {
-                // let amountToPay; 
-                if (period == '1 month'){
-                    amountToPay = '180'
-                }else if(period == '3 months'){
-                    amountToPay = '340';
-                }else if(period == '6 months'){
-                    amountToPay = '535';
-                }  
-                Profile.findOneAndUpdate(
-                    {email:req.userInfo.email,'applications.currentApplication.applicationStatus':"Approved"},
-                    {$set: {'applications.currentApplication.amount':amountToPay, 'applications.allApplications.0.amount':amountToPay}},
-                    {new: true}).then(
-                        async() => {
-                            const myApp = await Profile.findOne({email:req.userInfo.email}).populate('user');
-                            res.json({status:200,myApp});
-                        })
-            }else{
-                res.json({status:200,profile});
-            }
+        //         let amountToPay; 
+        //         if (origin == 'Ghorawadi' || origin == 'Begdewadi' || origin =='Dehu Road' || origin == 'Vadgaon') {
+        //             if (period == '1 month'){
+        //             amountToPay = '60'
+        //         }else if(period == '3 months'){
+        //             amountToPay = '160';
+        //         }else if(period == '6 months'){
+        //             amountToPay = '280';
+        //         }    
+        //         Profile.findOneAndUpdate(
+        //             {email:req.userInfo.email,'applications.currentApplication.applicationStatus':"Approved"},
+        //             {$set: {'applications.currentApplication.amount':amountToPay, 'applications.allApplications.0.amount':amountToPay}},
+        //             {new: true}).then(
+        //                 async() => {
+        //                     const myApp = await Profile.findOne({email:req.userInfo.email}).populate('user');
+        //                     res.json({status:200,myApp});
+        //                 })
+        //     }else if(origin == 'Akurdi' || origin == 'Chinchwad' || origin =='Pimpri' || origin == 'Kamshet' || origin == 'Kanhe') {
+        //         // let amountToPay; 
+        //         if (period == '1 month'){
+        //             amountToPay = '90'
+        //         }else if(period == '3 months'){
+        //             amountToPay = '210';
+        //         }else if(period == '6 months'){
+        //             amountToPay = '380';
+        //         }    
+        //         Profile.findOneAndUpdate(
+        //             {email:req.userInfo.email,'applications.currentApplication.applicationStatus':"Approved"},
+        //             {$set: {'applications.currentApplication.amount':amountToPay, 'applications.allApplications.0.amount':amountToPay}},
+        //             {new: true}).then(
+        //                 async() => {
+        //                     const myApp = await Profile.findOne({email:req.userInfo.email}).populate('user');
+        //                     res.json({status:200,myApp});
+        //                 })
+        //     }else if(origin == 'Kasarwadi' || origin == 'Dapodi' || origin == 'khadki' || origin == 'Malavli') {
+        //         // let amountToPay; 
+        //         if (period == '1 month'){
+        //             amountToPay = '130'
+        //         }else if(period == '3 months'){
+        //             amountToPay = '245';
+        //         }else if(period == '6 months'){
+        //             amountToPay = '480';
+        //         }     
+        //         Profile.findOneAndUpdate(
+        //             {email:req.userInfo.email,'applications.currentApplication.applicationStatus':"Approved"},
+        //             {$set: {'applications.currentApplication.amount':amountToPay, 'applications.allApplications.0.amount':amountToPay}},
+        //             {new: true}).then(
+        //                 async() => {
+        //                     const myApp = await Profile.findOne({email:req.userInfo.email}).populate('user');
+        //                     res.json({status:200,myApp});
+        //                 })
+        //     }else if(origin == 'Pune' || origin == 'Shivajinagar' || origin =='Lonawala') {
+        //         // let amountToPay; 
+        //         if (period == '1 month'){
+        //             amountToPay = '160'
+        //         }else if(period == '3 months'){
+        //             amountToPay = '320';
+        //         }else if(period == '6 months'){
+        //             amountToPay = '515';
+        //         }  
+        //         Profile.findOneAndUpdate(
+        //             {email:req.userInfo.email,'applications.currentApplication.applicationStatus':"Approved"},
+        //             {$set: {'applications.currentApplication.amount':amountToPay, 'applications.allApplications.0.amount':amountToPay}},
+        //             {new: true}).then(
+        //                 async() => {
+        //                     const myApp = await Profile.findOne({email:req.userInfo.email}).populate('user');
+        //                     res.json({status:200,myApp});
+        //                 })
+        //     }else{
+        //         res.json({status:200,profile});
+        //     }
+        //     }else if(via == "PMPML / Bus"){
+        //     let amountToPay; 
+        //     if (origin == 'Ghorawadi' || origin == 'Begdewadi' || origin =='Dehu Road' || origin == 'Vadgaon') {
+        //         if (period == '1 month'){
+        //             amountToPay = '90'
+        //         }else if(period == '3 months'){
+        //             amountToPay = '180';
+        //         }else if(period == '6 months'){
+        //             amountToPay = '300';
+        //         }    
+        //         Profile.findOneAndUpdate(
+        //             {email:req.userInfo.email,'applications.currentApplication.applicationStatus':"Approved"},
+        //             {$set: {'applications.currentApplication.amount':amountToPay, 'applications.allApplications.0.amount':amountToPay}},
+        //             {new: true}).then(
+        //                 async() => {
+        //                     const myApp = await Profile.findOne({email:req.userInfo.email}).populate('user');
+        //                     res.json({status:200,myApp});
+        //                 })
+        //     }else if(origin == 'Akurdi' || origin == 'Chinchwad' || origin =='Pimpri' || origin == 'Kamshet' || origin == 'Kanhe') {
+        //         // let amountToPay; 
+        //         if (period == '1 month'){
+        //             amountToPay = '110'
+        //         }else if(period == '3 months'){
+        //             amountToPay = '230';
+        //         }else if(period == '6 months'){
+        //             amountToPay = '400';
+        //         }    
+        //         Profile.findOneAndUpdate(
+        //             {email:req.userInfo.email,'applications.currentApplication.applicationStatus':"Approved"},
+        //             {$set: {'applications.currentApplication.amount':amountToPay, 'applications.allApplications.0.amount':amountToPay}},
+        //             {new: true}).then(
+        //                 async() => {
+        //                     const myApp = await Profile.findOne({email:req.userInfo.email}).populate('user');
+        //                     res.json({status:200,myApp});
+        //                 })
+        //     }else if(origin == 'Kasarwadi' || origin == 'Dapodi' || origin == 'khadki' || origin == 'Malavli') {
+        //         // let amountToPay; 
+        //         if (period == '1 month'){
+        //             amountToPay = '150'
+        //         }else if(period == '3 months'){
+        //             amountToPay = '265';
+        //         }else if(period == '6 months'){
+        //             amountToPay = '500';
+        //         }     
+        //         Profile.findOneAndUpdate(
+        //             {email:req.userInfo.email,'applications.currentApplication.applicationStatus':"Approved"},
+        //             {$set: {'applications.currentApplication.amount':amountToPay, 'applications.allApplications.0.amount':amountToPay}},
+        //             {new: true}).then(
+        //                 async() => {
+        //                     const myApp = await Profile.findOne({email:req.userInfo.email}).populate('user');
+        //                     res.json({status:200,myApp});
+        //                 })
+        //     }else if(origin == 'Pune' || origin == 'Shivajinagar' || origin =='Lonawala') {
+        //         // let amountToPay; 
+        //         if (period == '1 month'){
+        //             amountToPay = '180'
+        //         }else if(period == '3 months'){
+        //             amountToPay = '340';
+        //         }else if(period == '6 months'){
+        //             amountToPay = '535';
+        //         }  
+        //         Profile.findOneAndUpdate(
+        //             {email:req.userInfo.email,'applications.currentApplication.applicationStatus':"Approved"},
+        //             {$set: {'applications.currentApplication.amount':amountToPay, 'applications.allApplications.0.amount':amountToPay}},
+        //             {new: true}).then(
+        //                 async() => {
+        //                     const myApp = await Profile.findOne({email:req.userInfo.email}).populate('user');
+        //                     res.json({status:200,myApp});
+        //                 })
+        //     }else{
+        //         res.json({status:200,profile});
+        //     }
 
-            }else{
-                res.json({status:200,profile});
-            } 
-        }else{
-            res.json({status:200,profile});
-        }
+        //     }else{
+        //         res.json({status:200,profile});
+        //     } 
+        // }else{
+        //     res.json({status:200,profile});
+        // }
     } catch(err){
         res.json({status:'500', error:'Server Error',err});
     } 
@@ -325,82 +325,82 @@ export const myApps = async (req,res) => {
     try{
         const profile = await Profile.findOne({email:req.userInfo.email}).populate('user');
         if(!profile) return res.json({status:'400',message:'There is no profile for this user. Please Create one at `profile/create`'});
-        const origin = profile.applications.currentApplication.startLocation; 
-        // const dest = profile.applications.currentApplication.endLocation;
-        const period = profile.applications.currentApplication.travelPassPeriod;
-        // console.log(dest,origin); 
-        // console.log(profile); 
-        let amountToPay; 
-        if (origin == 'Ghorawadi' || origin == 'Begdewadi' || origin =='Dehu Road' || origin == 'Vadgaon') {
-            if (period == '1 month'){
-                amountToPay = '60'
-            }else if(period == '3 months'){
-                amountToPay = '160';
-            }else if(period == '6 months'){
-                amountToPay = '280';
-            }    
-            Profile.findOneAndUpdate(
-                {email:req.userInfo.email,'applications.currentApplication.applicationStatus':"Approved"},
-                {$set: {'applications.currentApplication.amount':amountToPay, 'applications.allApplications.0.amount':amountToPay}},
-                {new: true}).then(
-                    async() => {
-                        const myApp = await Profile.findOne({email:req.userInfo.email}).populate('user');
-                        res.json({status:200,myApp});
-                    })
-        }else if(origin == 'Akurdi' || origin == 'Chinchwad' || origin =='Pimpri' || origin == 'Kamshet' || origin == 'Kanhe') {
-            // let amountToPay; 
-            if (period == '1 month'){
-                amountToPay = '90'
-            }else if(period == '3 months'){
-                amountToPay = '210';
-            }else if(period == '6 months'){
-                amountToPay = '380';
-            }    
-            Profile.findOneAndUpdate(
-                {email:req.userInfo.email,'applications.currentApplication.applicationStatus':"Approved"},
-                {$set: {'applications.currentApplication.amount':amountToPay, 'applications.allApplications.0.amount':amountToPay}},
-                {new: true}).then(
-                    async() => {
-                        const myApp = await Profile.findOne({email:req.userInfo.email}).populate('user');
-                        res.json({status:200,myApp});
-                    })
-        }else if(origin == 'Kasarwasi' || origin == 'Dapodi' || origin == 'khadki' || origin == 'Malavli') {
-            // let amountToPay; 
-            if (period == '1 month'){
-                amountToPay = '130'
-            }else if(period == '3 months'){
-                amountToPay = '245';
-            }else if(period == '6 months'){
-                amountToPay = '480';
-            }     
-            Profile.findOneAndUpdate(
-                {email:req.userInfo.email,'applications.currentApplication.applicationStatus':"Approved"},
-                {$set: {'applications.currentApplication.amount':amountToPay, 'applications.allApplications.0.amount':amountToPay}},
-                {new: true}).then(
-                    async() => {
-                        const myApp = await Profile.findOne({email:req.userInfo.email}).populate('user');
-                        res.json({status:200,myApp});
-                    })
-        }else if(origin == 'Pune' || origin == 'Shivajinagar' || origin =='Lonawala') {
-            // let amountToPay; 
-            if (period == '1 month'){
-                amountToPay = '160'
-            }else if(period == '3 months'){
-                amountToPay = '320';
-            }else if(period == '6 months'){
-                amountToPay = '515';
-            }  
-            Profile.findOneAndUpdate(
-                {email:req.userInfo.email,'applications.currentApplication.applicationStatus':"Approved"},
-                {$set: {'applications.currentApplication.amount':amountToPay, 'applications.allApplications.0.amount':amountToPay}},
-                {new: true}).then(
-                    async() => {
-                        const myApp = await Profile.findOne({email:req.userInfo.email}).populate('user');
-                        res.json({status:200,myApp});
-                    })
-        }else{
-            res.json({status:200,profile});
-        }
+        // const origin = profile.applications.currentApplication.startLocation; 
+        // // const dest = profile.applications.currentApplication.endLocation;
+        // const period = profile.applications.currentApplication.travelPassPeriod;
+        // // console.log(dest,origin); 
+        // // console.log(profile); 
+        // let amountToPay; 
+        // if (origin == 'Ghorawadi' || origin == 'Begdewadi' || origin =='Dehu Road' || origin == 'Vadgaon') {
+        //     if (period == '1 month'){
+        //         amountToPay = '60'
+        //     }else if(period == '3 months'){
+        //         amountToPay = '160';
+        //     }else if(period == '6 months'){
+        //         amountToPay = '280';
+        //     }    
+        //     Profile.findOneAndUpdate(
+        //         {email:req.userInfo.email,'applications.currentApplication.applicationStatus':"Approved"},
+        //         {$set: {'applications.currentApplication.amount':amountToPay, 'applications.allApplications.0.amount':amountToPay}},
+        //         {new: true}).then(
+        //             async() => {
+        //                 const myApp = await Profile.findOne({email:req.userInfo.email}).populate('user');
+        //                 res.json({status:200,myApp});
+        //             })
+        // }else if(origin == 'Akurdi' || origin == 'Chinchwad' || origin =='Pimpri' || origin == 'Kamshet' || origin == 'Kanhe') {
+        //     // let amountToPay; 
+        //     if (period == '1 month'){
+        //         amountToPay = '90'
+        //     }else if(period == '3 months'){
+        //         amountToPay = '210';
+        //     }else if(period == '6 months'){
+        //         amountToPay = '380';
+        //     }    
+        //     Profile.findOneAndUpdate(
+        //         {email:req.userInfo.email,'applications.currentApplication.applicationStatus':"Approved"},
+        //         {$set: {'applications.currentApplication.amount':amountToPay, 'applications.allApplications.0.amount':amountToPay}},
+        //         {new: true}).then(
+        //             async() => {
+        //                 const myApp = await Profile.findOne({email:req.userInfo.email}).populate('user');
+        //                 res.json({status:200,myApp});
+        //             })
+        // }else if(origin == 'Kasarwasi' || origin == 'Dapodi' || origin == 'khadki' || origin == 'Malavli') {
+        //     // let amountToPay; 
+        //     if (period == '1 month'){
+        //         amountToPay = '130'
+        //     }else if(period == '3 months'){
+        //         amountToPay = '245';
+        //     }else if(period == '6 months'){
+        //         amountToPay = '480';
+        //     }     
+        //     Profile.findOneAndUpdate(
+        //         {email:req.userInfo.email,'applications.currentApplication.applicationStatus':"Approved"},
+        //         {$set: {'applications.currentApplication.amount':amountToPay, 'applications.allApplications.0.amount':amountToPay}},
+        //         {new: true}).then(
+        //             async() => {
+        //                 const myApp = await Profile.findOne({email:req.userInfo.email}).populate('user');
+        //                 res.json({status:200,myApp});
+        //             })
+        // }else if(origin == 'Pune' || origin == 'Shivajinagar' || origin =='Lonawala') {
+        //     // let amountToPay; 
+        //     if (period == '1 month'){
+        //         amountToPay = '160'
+        //     }else if(period == '3 months'){
+        //         amountToPay = '320';
+        //     }else if(period == '6 months'){
+        //         amountToPay = '515';
+        //     }  
+        //     Profile.findOneAndUpdate(
+        //         {email:req.userInfo.email,'applications.currentApplication.applicationStatus':"Approved"},
+        //         {$set: {'applications.currentApplication.amount':amountToPay, 'applications.allApplications.0.amount':amountToPay}},
+        //         {new: true}).then(
+        //             async() => {
+        //                 const myApp = await Profile.findOne({email:req.userInfo.email}).populate('user');
+        //                 res.json({status:200,myApp});
+        //             })
+        // }else{
+        //     res.json({status:200,profile});
+        // }
 
         // res.json({status:200,profile});
     } catch(err){
@@ -563,14 +563,190 @@ export const adminApproveApp = async(req,res) => {
         Profile.findOne({profileVerifyApplied:true,email:req.body.email,profileVerifystatus:'Verified','applications.currentApplication.applicationStatus':'Under Process'}).then(profileToApproove => {
             if (profileToApproove) {
                 // return res.json(profileToApproove.applications.allApplications[0].applicationStatus);
+                // ===================================================================
+                console.log(profileToApproove);
+                // const requestedProfile = Profile.findOne({email:req.body.email});
+                const origin = profileToApproove.applications.currentApplication.startLocation;
+                let amount;
+                if(origin){
+        
+                    // const dest = profileToApproove.applications.currentApplication.endLocation;
+                    const period = profileToApproove.applications.currentApplication.travelPassPeriod.toLowerCase();
+                    
+                    const via = profileToApproove.applications.currentApplication.travelOption;
+                    // console.log(dest,origin); 
+                    // console.log(profile); 
+                    if(via == "Local / Train"){
+                        
+                        let amountToPay; 
+                        if (origin == 'Ghorawadi' || origin == 'Begdewadi' || origin =='Dehu Road' || origin == 'Vadgaon') {
+                            if (period == '1 month'){
+                            amountToPay = '60'
+                        }else if(period == '3 months'){
+                            amountToPay = '160';
+                        }else if(period == '6 months'){
+                            amountToPay = '280';
+                        }
+                        amount = amountToPay;    
+                        // Profile.findOneAndUpdate(
+                        //     {email:req.userInfo.email,'applications.currentApplication.applicationStatus':"Approved"},
+                        //     {$set: {'applications.currentApplication.amount':amountToPay, 'applications.allApplications.0.amount':amountToPay}},
+                        //     {new: true}).then(
+                        //         async() => {
+                        //             const myApp = await Profile.findOne({email:req.userInfo.email}).populate('user');
+                        //             res.json({status:200,myApp});
+                        //         })
+                    }else if(origin == 'Akurdi' || origin == 'Chinchwad' || origin =='Pimpri' || origin == 'Kamshet' || origin == 'Kanhe') {
+                        // let amountToPay; 
+                        if (period == '1 month'){
+                            amountToPay = '90'
+                        }else if(period == '3 months'){
+                            amountToPay = '210';
+                        }else if(period == '6 months'){
+                            amountToPay = '380';
+                        }    
+                        amount = amountToPay;    
+                        // Profile.findOneAndUpdate(
+                        //     {email:req.userInfo.email,'applications.currentApplication.applicationStatus':"Approved"},
+                        //     {$set: {'applications.currentApplication.amount':amountToPay, 'applications.allApplications.0.amount':amountToPay}},
+                        //     {new: true}).then(
+                        //         async() => {
+                        //             const myApp = await Profile.findOne({email:req.userInfo.email}).populate('user');
+                        //             res.json({status:200,myApp});
+                        //         })
+                    }else if(origin == 'Kasarwadi' || origin == 'Dapodi' || origin == 'khadki' || origin == 'Malavli') {
+                        // let amountToPay; 
+                        if (period == '1 month'){
+                            amountToPay = '130'
+                        }else if(period == '3 months'){
+                            amountToPay = '245';
+                        }else if(period == '6 months'){
+                            amountToPay = '480';
+                        }     
+                        // Profile.findOneAndUpdate(
+                        //     {email:req.userInfo.email,'applications.currentApplication.applicationStatus':"Approved"},
+                        //     {$set: {'applications.currentApplication.amount':amountToPay, 'applications.allApplications.0.amount':amountToPay}},
+                        //     {new: true}).then(
+                        //         async() => {
+                        //             const myApp = await Profile.findOne({email:req.userInfo.email}).populate('user');
+                        //             res.json({status:200,myApp});
+                        //         })
+                        amount = amountToPay;    
+                    }else if(origin == 'Pune' || origin == 'Shivajinagar' || origin =='Lonawala') {
+                        // let amountToPay; 
+                        if (period == '1 month'){
+                            amountToPay = '160'
+                        }else if(period == '3 months'){
+                            amountToPay = '320';
+                        }else if(period == '6 months'){
+                            amountToPay = '515';
+                        }  
+                        // Profile.findOneAndUpdate(
+                        //     {email:req.userInfo.email,'applications.currentApplication.applicationStatus':"Approved"},
+                        //     {$set: {'applications.currentApplication.amount':amountToPay, 'applications.allApplications.0.amount':amountToPay}},
+                        //     {new: true}).then(
+                        //         async() => {
+                        //             const myApp = await Profile.findOne({email:req.userInfo.email}).populate('user');
+                        //             res.json({status:200,myApp});
+                        //         })
+                        amount = amountToPay;    
+                    }else{
+                        amount = "error in start location of train";
+                    }
+                    }else if(via == "PMPML / Bus"){
+                    let amountToPay; 
+                    if (origin == 'Ghorawadi' || origin == 'Begdewadi' || origin =='Dehu Road' || origin == 'Vadgaon') {
+                        if (period == '1 month'){
+                            amountToPay = '90'
+                        }else if(period == '3 months'){
+                            amountToPay = '180';
+                        }else if(period == '6 months'){
+                            amountToPay = '300';
+                        }    
+                        // Profile.findOneAndUpdate(
+                        //     {email:req.userInfo.email,'applications.currentApplication.applicationStatus':"Approved"},
+                        //     {$set: {'applications.currentApplication.amount':amountToPay, 'applications.allApplications.0.amount':amountToPay}},
+                        //     {new: true}).then(
+                        //         async() => {
+                        //             const myApp = await Profile.findOne({email:req.userInfo.email}).populate('user');
+                        //             res.json({status:200,myApp});
+                        //         })
+                        amount = amountToPay;    
+                    }else if(origin == 'Akurdi' || origin == 'Chinchwad' || origin =='Pimpri' || origin == 'Kamshet' || origin == 'Kanhe') {
+                        // let amountToPay; 
+                        if (period == '1 month'){
+                            amountToPay = '110'
+                        }else if(period == '3 months'){
+                            amountToPay = '230';
+                        }else if(period == '6 months'){
+                            amountToPay = '400';
+                        }    
+                        // Profile.findOneAndUpdate(
+                        //     {email:req.userInfo.email,'applications.currentApplication.applicationStatus':"Approved"},
+                        //     {$set: {'applications.currentApplication.amount':amountToPay, 'applications.allApplications.0.amount':amountToPay}},
+                        //     {new: true}).then(
+                        //         async() => {
+                        //             const myApp = await Profile.findOne({email:req.userInfo.email}).populate('user');
+                        //             res.json({status:200,myApp});
+                        //         })
+                        amount = amountToPay;    
+                    }else if(origin == 'Kasarwadi' || origin == 'Dapodi' || origin == 'khadki' || origin == 'Malavli') {
+                        // let amountToPay; 
+                        if (period == '1 month'){
+                            amountToPay = '150'
+                        }else if(period == '3 months'){
+                            amountToPay = '265';
+                        }else if(period == '6 months'){
+                            amountToPay = '500';
+                        }     
+                        // Profile.findOneAndUpdate(
+                        //     {email:req.userInfo.email,'applications.currentApplication.applicationStatus':"Approved"},
+                        //     {$set: {'applications.currentApplication.amount':amountToPay, 'applications.allApplications.0.amount':amountToPay}},
+                        //     {new: true}).then(
+                        //         async() => {
+                        //             const myApp = await Profile.findOne({email:req.userInfo.email}).populate('user');
+                        //             res.json({status:200,myApp});
+                        //         })
+                        amount = amountToPay;    
+                    }else if(origin == 'Pune' || origin == 'Shivajinagar' || origin =='Lonawala') {
+                        // let amountToPay; 
+                        if (period == '1 month'){
+                            amountToPay = '180'
+                        }else if(period == '3 months'){
+                            amountToPay = '340';
+                        }else if(period == '6 months'){
+                            amountToPay = '535';
+                        }  
+                        // Profile.findOneAndUpdate(
+                        //     {email:req.userInfo.email,'applications.currentApplication.applicationStatus':"Approved"},
+                        //     {$set: {'applications.currentApplication.amount':amountToPay, 'applications.allApplications.0.amount':amountToPay}},
+                        //     {new: true}).then(
+                        //         async() => {
+                        //             const myApp = await Profile.findOne({email:req.userInfo.email}).populate('user');
+                        //             res.json({status:200,myApp});
+                        //         })
+                        amount = amountToPay;    
+                    }else{
+                        amount = "error in start location of bus";
+                    }
+        
+                    }else{
+                        amount = "Error in travelOption"
+                    } 
+                }else{
+                    res.json({status:400,message:"Application invalid"});
+                }
+                // console.log(amount);
+                // ===================================================================
                 Profile.findOneAndUpdate(
                     // {email:req.body.email,'applications.currentApplication.applicationStatus':"Under Process"},
                     {email:req.body.email,'applications.allApplications.applicationStatus':"Under Process"},
                     // {email:req.body.email},
-                    {$set:{'applications.currentApplication.applicationStatus':"Approved",'applications.allApplications.$.applicationStatus':"Approved",'applications.allApplications.$.applicationAcceptedOn':Date().toString(),'applications.currentApplication.applicationAcceptedOn':Date().toString()}},
+                    {$set:{'applications.currentApplication.applicationStatus':"Approved",'applications.currentApplication.amount':amount,'applications.allApplications.$.applicationStatus':"Approved",'applications.allApplications.$.amount':amount,'applications.allApplications.$.applicationAcceptedOn':Date().toString(),'applications.currentApplication.applicationAcceptedOn':Date().toString()}},
                     // {$set:{'applications.allApplications.$.applicationStatus':"calm"}},
                     {new: true}
                     ).then( async() => {
+
                         const unapprovedProfiles = await Profile.find({'applications.currentApplication.applicationStatus':"Under Process"});
                         const approvedProfiles = await Profile.find({'applications.currentApplication.applicationStatus':"Approved"});
                         const userType = req.userInfo.type;
