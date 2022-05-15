@@ -75,22 +75,24 @@ export const verifyProfile = async(req,res) => {
 //Get Route to View Current User's Profile
 export const currentProfile = async (req,res) => {
     try{
+        // console.log("cool");
         const profile = await Profile.findOne({user:req.userId}).populate('user');
         if(!profile) return res.json({status:'400',message:'There is no profile for this user. Please Create one at `profile/create`'});
         // res.json({status:200,profile});
-        const origin = profile.applications.currentApplication.startLocation; 
-        // const dest = profile.applications.currentApplication.endLocation;
-        const period = profile.applications.currentApplication.travelPassPeriod.toLowerCase();
+        const origin = profile.applications.currentApplication.startLocation;
+        if(origin){
 
-        const via = profile.applications.currentApplication.travelOption;
-
-        // console.log(dest,origin); 
-        // console.log(profile); 
-        if(via == "Local / Train"){
-
-            let amountToPay; 
-            if (origin == 'Ghorawadi' || origin == 'Begdewadi' || origin =='Dehu Road' || origin == 'Vadgaon') {
-                if (period == '1 month'){
+            // const dest = profile.applications.currentApplication.endLocation;
+            const period = profile.applications.currentApplication.travelPassPeriod.toLowerCase();
+            
+            const via = profile.applications.currentApplication.travelOption;
+            // console.log(dest,origin); 
+            // console.log(profile); 
+            if(via == "Local / Train"){
+                
+                let amountToPay; 
+                if (origin == 'Ghorawadi' || origin == 'Begdewadi' || origin =='Dehu Road' || origin == 'Vadgaon') {
+                    if (period == '1 month'){
                     amountToPay = '60'
                 }else if(period == '3 months'){
                     amountToPay = '160';
@@ -159,7 +161,7 @@ export const currentProfile = async (req,res) => {
             }else{
                 res.json({status:200,profile});
             }
-        }else if(via == "PMPML / Bus"){
+            }else if(via == "PMPML / Bus"){
             let amountToPay; 
             if (origin == 'Ghorawadi' || origin == 'Begdewadi' || origin =='Dehu Road' || origin == 'Vadgaon') {
                 if (period == '1 month'){
@@ -232,11 +234,14 @@ export const currentProfile = async (req,res) => {
                 res.json({status:200,profile});
             }
 
+            }else{
+                res.json({status:200,profile});
+            } 
         }else{
             res.json({status:200,profile});
         }
     } catch(err){
-        res.json({status:'500', error:'Server Error'});
+        res.json({status:'500', error:'Server Error',err});
     } 
 }
 
