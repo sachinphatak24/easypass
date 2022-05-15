@@ -105,7 +105,7 @@ export const currentProfile = async (req,res) => {
                     {new: true}).then(
                         async() => {
                             const myApp = await Profile.findOne({email:req.userInfo.email}).populate('user');
-                            res.json({status:201,myApp});
+                            res.json({status:200,myApp});
                         })
             }else if(origin == 'Akurdi' || origin == 'Chinchwad' || origin =='Pimpri' || origin == 'Kamshet' || origin == 'Kanhe') {
                 // let amountToPay; 
@@ -122,7 +122,7 @@ export const currentProfile = async (req,res) => {
                     {new: true}).then(
                         async() => {
                             const myApp = await Profile.findOne({email:req.userInfo.email}).populate('user');
-                            res.json({status:201,myApp});
+                            res.json({status:200,myApp});
                         })
             }else if(origin == 'Kasarwadi' || origin == 'Dapodi' || origin == 'khadki' || origin == 'Malavli') {
                 // let amountToPay; 
@@ -139,7 +139,7 @@ export const currentProfile = async (req,res) => {
                     {new: true}).then(
                         async() => {
                             const myApp = await Profile.findOne({email:req.userInfo.email}).populate('user');
-                            res.json({status:201,myApp});
+                            res.json({status:200,myApp});
                         })
             }else if(origin == 'Pune' || origin == 'Shivajinagar' || origin =='Lonawala') {
                 // let amountToPay; 
@@ -156,7 +156,7 @@ export const currentProfile = async (req,res) => {
                     {new: true}).then(
                         async() => {
                             const myApp = await Profile.findOne({email:req.userInfo.email}).populate('user');
-                            res.json({status:201,myApp});
+                            res.json({status:200,myApp});
                         })
             }else{
                 res.json({status:200,profile});
@@ -177,7 +177,7 @@ export const currentProfile = async (req,res) => {
                     {new: true}).then(
                         async() => {
                             const myApp = await Profile.findOne({email:req.userInfo.email}).populate('user');
-                            res.json({status:201,myApp});
+                            res.json({status:200,myApp});
                         })
             }else if(origin == 'Akurdi' || origin == 'Chinchwad' || origin =='Pimpri' || origin == 'Kamshet' || origin == 'Kanhe') {
                 // let amountToPay; 
@@ -194,7 +194,7 @@ export const currentProfile = async (req,res) => {
                     {new: true}).then(
                         async() => {
                             const myApp = await Profile.findOne({email:req.userInfo.email}).populate('user');
-                            res.json({status:201,myApp});
+                            res.json({status:200,myApp});
                         })
             }else if(origin == 'Kasarwadi' || origin == 'Dapodi' || origin == 'khadki' || origin == 'Malavli') {
                 // let amountToPay; 
@@ -211,7 +211,7 @@ export const currentProfile = async (req,res) => {
                     {new: true}).then(
                         async() => {
                             const myApp = await Profile.findOne({email:req.userInfo.email}).populate('user');
-                            res.json({status:201,myApp});
+                            res.json({status:200,myApp});
                         })
             }else if(origin == 'Pune' || origin == 'Shivajinagar' || origin =='Lonawala') {
                 // let amountToPay; 
@@ -228,7 +228,7 @@ export const currentProfile = async (req,res) => {
                     {new: true}).then(
                         async() => {
                             const myApp = await Profile.findOne({email:req.userInfo.email}).populate('user');
-                            res.json({status:201,myApp});
+                            res.json({status:200,myApp});
                         })
             }else{
                 res.json({status:200,profile});
@@ -345,7 +345,7 @@ export const myApps = async (req,res) => {
                 {new: true}).then(
                     async() => {
                         const myApp = await Profile.findOne({email:req.userInfo.email}).populate('user');
-                        res.json({status:201,myApp});
+                        res.json({status:200,myApp});
                     })
         }else if(origin == 'Akurdi' || origin == 'Chinchwad' || origin =='Pimpri' || origin == 'Kamshet' || origin == 'Kanhe') {
             // let amountToPay; 
@@ -362,7 +362,7 @@ export const myApps = async (req,res) => {
                 {new: true}).then(
                     async() => {
                         const myApp = await Profile.findOne({email:req.userInfo.email}).populate('user');
-                        res.json({status:201,myApp});
+                        res.json({status:200,myApp});
                     })
         }else if(origin == 'Kasarwasi' || origin == 'Dapodi' || origin == 'khadki' || origin == 'Malavli') {
             // let amountToPay; 
@@ -379,7 +379,7 @@ export const myApps = async (req,res) => {
                 {new: true}).then(
                     async() => {
                         const myApp = await Profile.findOne({email:req.userInfo.email}).populate('user');
-                        res.json({status:201,myApp});
+                        res.json({status:200,myApp});
                     })
         }else if(origin == 'Pune' || origin == 'Shivajinagar' || origin =='Lonawala') {
             // let amountToPay; 
@@ -396,7 +396,7 @@ export const myApps = async (req,res) => {
                 {new: true}).then(
                     async() => {
                         const myApp = await Profile.findOne({email:req.userInfo.email}).populate('user');
-                        res.json({status:201,myApp});
+                        res.json({status:200,myApp});
                     })
         }else{
             res.json({status:200,profile});
@@ -557,9 +557,10 @@ export const adminGetApp = async(req,res) => {
 }
 
 // Post Route For Admin to Approve New Application of Concession Letter **
+// collegeName:req.userInfo.collegeName,
 export const adminApproveApp = async(req,res) => {
     try {
-        Profile.findOne({profileVerifyApplied:true,email:req.body.email,collegeName:req.userInfo.collegeName,profileVerifystatus:'Verified','applications.currentApplication.applicationStatus':'Under Process'}).then(profileToApproove => {
+        Profile.findOne({profileVerifyApplied:true,email:req.body.email,profileVerifystatus:'Verified','applications.currentApplication.applicationStatus':'Under Process'}).then(profileToApproove => {
             if (profileToApproove) {
                 // return res.json(profileToApproove.applications.allApplications[0].applicationStatus);
                 Profile.findOneAndUpdate(
