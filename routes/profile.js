@@ -59,7 +59,7 @@ router.post('/paymentVerify',authenticate, async(req,res) => {
                 {user:req.userId},
                 // {email:req.body.email},
                 // {$set:{'applications.currentApplication.amountPaid':true,'applications.currentApplication.paymentId':razorpay_payment_id,'applications.allApplications.$.amountPaid':true,'applications.allApplications.$.paymentId':razorpay_payment_id,'applications.allApplications.$.paymentPaidOn':Date().toString(),'applications.currentApplication.paymentPaidOn':Date().toString()}},
-                {$set:{'applications.currentApplication.amountPaid':true,'applications.currentApplication.paymentId':razorpay_payment_id}},
+                {$set:{'applications.currentApplication.amountPaid':true,'applications.currentApplication.paymentId':razorpay_payment_id,'applications.allApplications.$.amountPaid':true,'applications.allApplications.$.paymentId':razorpay_payment_id}},
                 // {$set:{'applications.allApplications.$.applicationStatus':"calm"}},
                 {new: true}
                 ).then( async() => {   
