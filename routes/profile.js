@@ -53,9 +53,9 @@ router.post('/paymentVerify', async(req,res) => {
             razorpay_signature} = req.body;
         const sign = razorpay_order_id + "|" + razorpay_payment_id;
         const expectedSign = crypto.createHmac("sha256","9hFynk38trO5l5iRya52zV4i").update(sign.toString()).digest("hex");
-
+        const dataa = req.body;
         if (razorpay_signature === expectedSign) {
-            return res.json({status:200,sign, message:"Payment Verified Successfully!"});
+            return res.json({status:200,dataa, message:"Payment Verified Successfully!"});
         } else {
             return res.json({status:400, message:"Invalid Signature Sent!"});
         }
