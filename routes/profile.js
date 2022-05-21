@@ -63,7 +63,7 @@ router.post('/paymentVerify',authenticate, async(req,res) => {
                 // {$set:{'applications.allApplications.$.applicationStatus':"calm"}},
                 {new: true}
                 ).then( async() =>{
-                    const response = Profile.findOne({email:req.userInfo.email});
+                    const response = await Profile.findOne({email:req.userInfo.email});
                     return res.json({status:200,response,dataa, message:"Payment Verified Successfully!"});
                 } 
                 )
