@@ -61,11 +61,9 @@ router.post('/paymentVerify',authenticate, async(req,res) => {
                 {$set:{'applications.currentApplication.amountPaid':true,'applications.currentApplication.paymentId':razorpay_payment_id,'applications.allApplications.$.amountPaid':true,'applications.allApplications.$.paymentId':razorpay_payment_id,'applications.allApplications.$.paymentPaidOn':Date().toString(),'applications.currentApplication.paymentPaidOn':Date().toString()}},
                 // {$set:{'applications.allApplications.$.applicationStatus':"calm"}},
                 {new: true}
-                ).then( async() =>{
-                    const response = await Profile.findOne({email:req.userInfo.email});
-                    return res.json({status:200,response,message:"Payment Verified Successfully!"});
-                } 
                 )
+                const response = await Profile.findOne({email:req.userInfo.email});
+                return res.json({status:200,response,message:"Payment Verified Successfully!"});
         } else {
             return res.json({status:400, message:"Invalid Signature Sent!"});
         }
