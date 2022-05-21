@@ -8,9 +8,9 @@ import upload from '../utils/multer.js';
 
 import crypto from 'crypto';
 // ============================
-
-
+import request from 'request';
 // ============================
+import Profile from '../models/profile.js';
 
 
 import Razorpay from 'razorpay'; 
@@ -21,7 +21,7 @@ import {allProfiles, myApps, verifyProfile, adminverifyProfile, adminverifyProfi
 
 // =================================
 // order Route
-router.post('/orders', async(req,res) =>{
+router.post('/orders',authenticate, async(req,res) =>{
     try {
         const instance=new Razorpay({
             key_id:'rzp_test_kehCvQHYpkIrTO',
@@ -45,7 +45,7 @@ router.post('/orders', async(req,res) =>{
     }
 });
 
-router.post('/paymentVerify', async(req,res) => {
+router.post('/paymentVerify',authenticate, async(req,res) => {
     try {
         const {
             razorpay_order_id,
@@ -55,7 +55,18 @@ router.post('/paymentVerify', async(req,res) => {
         const expectedSign = crypto.createHmac("sha256","9hFynk38trO5l5iRya52zV4i").update(sign.toString()).digest("hex");
         const dataa = req.body;
         if (razorpay_signature === expectedSign) {
-            return res.json({status:200,dataa, message:"Payment Verified Successfully!"});
+            Profile.findOneAndUpdate(
+                // {email:req.body.email,'applications.currentApplication.applicationStatus':"Under Process"},
+                {email:req.userInfo.email},
+                // {email:req.body.email},
+                {$set:{'applications.currentApplication.amountPaid':true,'applications.currentApplication.paymentId':razorpay_payment_id,'applications.allApplications.$.amountPaid':true,'applications.allApplications.$.paymentId':razorpay_payment_id,'applications.allApplications.$.paymentPaidOn':Date().toString(),'applications.currentApplication.paymentPaidOn':Date().toString()}},
+                // {$set:{'applications.allApplications.$.applicationStatus':"calm"}},
+                {new: true}
+                ).then( async() =>{
+                    const response = Profile.findOne({email:req.userInfo.email});
+                    return res.json({status:200,response,dataa, message:"Payment Verified Successfully!"});
+                } 
+                )
         } else {
             return res.json({status:400, message:"Invalid Signature Sent!"});
         }
@@ -64,7 +75,37 @@ router.post('/paymentVerify', async(req,res) => {
     }
 })
 
+router.get("/payments",authenticate, (req, res) => {
+    // const order = req.body;
+    // console.log(req.body);
+    // order.exec((err, data) => {
+    //   if (err || data == null) {
+    //     return res.json({
+    //       error: "No order Found",
+    //     });
+    //   }
+    try {
+        const profile = Profile.findOne({email:req.userInfo.email});
+        const paymentID = profile.applications.currentApplication.paymentId;
+        request(
+            `https://${'rzp_test_kehCvQHYpkIrTO'}:${'9hFynk38trO5l5iRya52zV4i'}@api.razorpay.com/v1/payments/${paymentID}`,
+            function (error, response, body) {
+                if (body) {
+                    const result = JSON.parse(body);
+                    res.json({status:200,result});
+                }else{
+                    res.json({status:400,message:"No payment history."});
 
+                }
+            }
+            );
+            
+        } catch (error) {
+            res.json({status:500, message: error});
+        }
+        });
+        
+        
 
 
 // =================================

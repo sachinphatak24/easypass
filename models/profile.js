@@ -32,7 +32,9 @@ const profileSchema = mongoose.Schema({
             addressProof:{type:String},
             
             amount:{type:String},
-            amountPaid:{type:Boolean, default:false}
+            amountPaid:{type:Boolean, default:false},
+            paymentId:{type:String},
+            paymentPaidOn:{type:String}
 
         },
         allApplications:[
@@ -51,7 +53,9 @@ const profileSchema = mongoose.Schema({
             applicationAcceptedOn:{type:String},
             
             amount:{type:String},
-            amountPaid:{type:Boolean, default:false}
+            amountPaid:{type:Boolean, default:false},
+            paymentId:{type:String},
+            paymentPaidOn:{type:String}
         }],
     },
         passinfo:[{
