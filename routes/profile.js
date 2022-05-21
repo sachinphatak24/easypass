@@ -53,7 +53,6 @@ router.post('/paymentVerify',authenticate, async(req,res) => {
             razorpay_signature} = req.body;
         const sign = razorpay_order_id + "|" + razorpay_payment_id;
         const expectedSign = crypto.createHmac("sha256","9hFynk38trO5l5iRya52zV4i").update(sign.toString()).digest("hex");
-        const dataa = req.body;
         if (razorpay_signature === expectedSign) {
             Profile.findOneAndUpdate(
                 // {email:req.body.email,'applications.currentApplication.applicationStatus':"Under Process"},
@@ -64,7 +63,7 @@ router.post('/paymentVerify',authenticate, async(req,res) => {
                 {new: true}
                 ).then( async() =>{
                     const response = await Profile.findOne({email:req.userInfo.email});
-                    return res.json({status:200,response,dataa, message:"Payment Verified Successfully!"});
+                    return res.json({status:200,response,message:"Payment Verified Successfully!"});
                 } 
                 )
         } else {
