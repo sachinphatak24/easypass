@@ -12,8 +12,17 @@ import request from 'request';
 // ============================
 import Profile from '../models/profile.js';
 
+import nodemailer from 'nodemailer';
 
 import Razorpay from 'razorpay'; 
+
+var transporter = nodemailer.createTransport({
+    service: 'gmail',
+    auth: {
+      user: 'easypass24@gmail.com',
+      pass: 'Easypass123'
+    }
+  });
 // =========================================================
 
 // myApps
@@ -64,6 +73,28 @@ router.post('/paymentVerify',authenticate, async(req,res) => {
                 {new: true}
                 ).then( async() => {   
                     const response = await Profile.findOne({user:req.userId});
+                    var mailOptions = {
+                        from: 'easypass24@gmail.com',
+                        to: response.email,
+                        subject: 'Profile Verification',
+                        text: `
+                Hi ${response.nameAsPerIdCard.charAt(0).toUpperCase()+ response.nameAsPerIdCard.slice(1)},
+                        
+                    Your Payment Of Rs.${response.applications.currentApplication.amount} Was Succssful For Your Travel Pass.
+                
+                
+                Thank You!
+                EasyPass`
+    
+                        };
+                        transporter.sendMail(mailOptions, function(error, info){
+                            if (error) {
+                                console.log(error);
+                            } else {
+                                console.log('Email sent: ' + info.response);
+                            }
+                        });   
+    
                     return res.json({status:200,response,message:"Payment Verified Successfully!"});
                 }
                     )

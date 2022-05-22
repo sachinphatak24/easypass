@@ -4,12 +4,33 @@ import cloudinary from '../utils/cloudinary.js'
 import User from '../models/user.js';
 
 import QRCode from 'qrcode';
+import nodemailer from 'nodemailer';
+import profile from '../models/profile.js';
 // import Razorpay from 'razorpay'; 
 
 // ==========================
-// export const paymentRoute = async(req,res)=>{
-
-// }
+var transporter = nodemailer.createTransport({
+    service: 'gmail',
+    auth: {
+      user: 'easypass24@gmail.com',
+      pass: 'Easypass123'
+    }
+  });
+  
+//   var mailOptions = {
+//     from: 'easypass24@gmail.com',
+//     to: profile.email,
+//     subject: 'Register',
+//     text: `Hi ${cal} Thank You For Registering To EasyPass, Hope You Have A Wonderfull & Hassle-Free Experience`
+//   };
+  
+//   transporter.sendMail(mailOptions, function(error, info){
+//     if (error) {
+//       console.log(error);
+//     } else {
+//       console.log('Email sent: ' + info.response);
+//     }
+//   });
 
 export const proPic = async(req,res) => {
     try {
@@ -88,7 +109,34 @@ export const verifyProfile = async(req,res) => {
                 {user: req.userId},
                 {$set: {profileVerifyApplied:true}},
                 {new: true}
-                ).then(profilee => res.json({status:200, profilee,message:'Profile successfully sent for verification'}));
+                ).then(profilee => {
+                    console.log(profilee.email);
+                    console.log(profilee.nameAsPerIdCard);
+                    var mailOptions = {
+                    from: 'easypass24@gmail.com',
+                    to: profilee.email,
+                    subject: 'Profile Verification',
+                    text: `
+            Hi ${profilee.nameAsPerIdCard.charAt(0).toUpperCase()+ profilee.nameAsPerIdCard.slice(1)},
+                    
+                Your Profile Has Been Succssfully Sent For Verification. Please Wait For A Few Days For A Response.
+            
+            
+            Thank You!
+            EasyPass`
+
+                    };
+                    transporter.sendMail(mailOptions, function(error, info){
+                        if (error) {
+                            console.log(error);
+                        } else {
+                            console.log('Email sent: ' + info.response);
+                        }
+                    });   
+            
+                    res.json({status:200, profilee,message:'Profile successfully sent for verification'});
+                
+                }) 
             }else{
                 res.json({status:401, message:'Please Create a Profile before applying for verification or Please check if profile is already applied for verification'})       
         }    
@@ -361,7 +409,31 @@ export const adminverifyProfilee = async(req,res) => {
                     {profileVerifyApplied:true,email:req.body.email},
                     {$set:{profileVerifystatus:'Verified',profileVerifyDate:Date().toString()}},
                     {new: true}
-                    ).then( async() => {
+                    ).then( async profileToVerify => {
+                        console.log(profileToVerify);
+                        console.log(profileToVerify.nameAsPerIdCard);
+                        var mailOptions = {
+                            from: 'easypass24@gmail.com',
+                            to: profileToVerify.email,
+                            subject: 'Profile Verification Done!',
+                            text: `
+                    Hi ${profileToVerify.nameAsPerIdCard.charAt(0).toUpperCase()+ profileToVerify.nameAsPerIdCard.slice(1)},
+                            
+                        Your Profile Has Been Succssfully Verified!. You Can Now Apply For Railway/Bus Applications To Get Your Concession-Letter & Pass.
+                    
+                    
+                    Thank You!
+                    EasyPass`
+        
+                            };
+                            transporter.sendMail(mailOptions, function(error, info){
+                                if (error) {
+                                    console.log(error);
+                                } else {
+                                    console.log('Email sent: ' + info.response);
+                                }
+                            });   
+        
                         const unVerifiedProfiles = await Profile.find({profileVerifyApplied:true,collegeName:req.userInfo.collegeName,profileVerifystatus:'UnVerified'});
                         const verifiedProfiles = await Profile.find({profileVerifyApplied:true, collegeName:req.userInfo.collegeName,profileVerifystatus:'Verified'});
                         const userType = req.userInfo.type;
@@ -439,7 +511,7 @@ export const adminApproveApp = async(req,res) => {
             if (profileToApproove) {
                 // return res.json(profileToApproove.applications.allApplications[0].applicationStatus);
                 // ===================================================================
-                console.log(profileToApproove);
+                // console.log(profileToApproove);
                 // const requestedProfile = Profile.findOne({email:req.body.email});
                 const origin = profileToApproove.applications.currentApplication.startLocation;
                 let amount;
@@ -621,6 +693,30 @@ export const adminApproveApp = async(req,res) => {
                     // {$set:{'applications.allApplications.$.applicationStatus':"calm"}},
                     {new: true}
                     ).then( async() => {
+                        const currentApp = await Profile.findOne({email:req.body.email});
+                        console.log(currentApp);
+                        console.log(currentApp.nameAsPerIdCard);
+                        var mailOptions = {
+                            from: 'easypass24@gmail.com',
+                            to: currentApp.email,
+                            subject: 'Application Verification Done!',
+                            text: `
+                    Hi ${currentApp.nameAsPerIdCard.charAt(0).toUpperCase()+ currentApp.nameAsPerIdCard.slice(1)},
+                            
+                        Your Application Has Been Succesfully Verified & Accepted!.
+                    
+                    
+                    Thank You!
+                    EasyPass`
+        
+                            };
+                            transporter.sendMail(mailOptions, function(error, info){
+                                if (error) {
+                                    console.log(error);
+                                } else {
+                                    console.log('Email sent: ' + info.response);
+                                }
+                            });
 
                         const unapprovedProfiles = await Profile.find({'applications.currentApplication.applicationStatus':"Under Process"});
                         const approvedProfiles = await Profile.find({'applications.currentApplication.applicationStatus':"Approved"});

@@ -4,9 +4,17 @@ import  jwt  from 'jsonwebtoken';
 import userModal from '../models/user.js';
 import admin from '../models/admins.js';
 import profile from '../models/profile.js';
-
+import nodemailer from 'nodemailer';
 const secret = 'testing';
 
+var transporter = nodemailer.createTransport({
+    service: 'gmail',
+    auth: {
+      user: 'easypass24@gmail.com',
+      pass: 'Easypass123'
+    }
+  });
+  
 //User SignIn
 export const signin = async(req,res) => {
     const {email,password,type} = req.body;
@@ -61,6 +69,24 @@ export const signup = async(req,res) => {
 
 
         const result = await userModal.create({email, password: hashedPassword,name:`${name}`,type:`${type}`});
+
+        const currentUser = await userModal.findOne({email:email});
+        console.log(currentUser.name);
+        var mailOptions = {
+            from: 'easypass24@gmail.com',
+            to: currentUser.email,
+            subject: 'Account Registeration',
+            text: `Hi ${currentUser.name.charAt(0).toUpperCase()+ currentUser.name.slice(1)},
+            Thank You For Registering To EasyPass, Hope You Have A Wonderfull & Hassle-Free Experience.`
+          };
+          
+          transporter.sendMail(mailOptions, function(error, info){
+            if (error) {
+              console.log(error);
+            } else {
+              console.log('Email sent: ' + info.response);
+            }
+          });
         res.json({status:200,message:'Registered Successfully!'});
         
 
