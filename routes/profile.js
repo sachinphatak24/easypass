@@ -76,7 +76,7 @@ router.post('/paymentVerify',authenticate, async(req,res) => {
                     var mailOptions = {
                         from: 'easypass24@gmail.com',
                         to: response.email,
-                        subject: 'Profile Verification',
+                        subject: 'Payment Succesfull!',
                         text: `
                 Hi ${response.nameAsPerIdCard.charAt(0).toUpperCase()+ response.nameAsPerIdCard.slice(1)},
                         
