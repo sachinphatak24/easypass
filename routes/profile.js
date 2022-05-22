@@ -72,7 +72,7 @@ router.post('/paymentVerify',authenticate, async(req,res) => {
                 // {$set:{'applications.allApplications.$.applicationStatus':"calm"}},
                 {new: true}
                 ).then( async() => {   
-                    const response = await Profile.findOne({user:req.userId});
+                    const response = await Profile.findOne({user:req.userId}).populate('user');
                     var mailOptions = {
                         from: 'easypass24@gmail.com',
                         to: response.email,

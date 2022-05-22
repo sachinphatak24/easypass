@@ -424,6 +424,8 @@ export const adminverifyProfilee = async(req,res) => {
                     
                     Thank You!
                     EasyPass`
+                    // ,
+                            // html:<img src = ""></img>
         
                             };
                             transporter.sendMail(mailOptions, function(error, info){
