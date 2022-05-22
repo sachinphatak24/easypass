@@ -75,7 +75,7 @@ export const signup = async(req,res) => {
         var mailOptions = {
             from: 'easypass24@gmail.com',
             to: currentUser.email,
-            subject: 'Account Registeration',
+            subject: 'Account Registeration Successful',
             text: `Hi ${currentUser.name.charAt(0).toUpperCase()+ currentUser.name.slice(1)},
             Thank You For Registering To EasyPass, Hope You Have A Wonderfull & Hassle-Free Experience.`
           };
