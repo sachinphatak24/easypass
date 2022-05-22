@@ -106,14 +106,15 @@ router.post('/paymentVerify',authenticate, async(req,res) => {
     }
 })
 
-router.get("/payments",authenticate, async (req, res) => {
+router.post("/payments",authenticate, async (req, res) => {
     try {
-        const profile = await Profile.findOne({email:req.userInfo.email});
-        console.log(profile);
-        console.log(profile.applications.currentApplication.paymentId);
-        const paymentID = profile.applications.currentApplication.paymentId;
+        // const profile = await Profile.findOne({email:req.userInfo.email});
+        // console.log(profile);
+        // console.log(profile.applications.currentApplication.paymentId);
+        // const paymentID = profile.applications.currentApplication.paymentId;
+        const paymentId = req.body.paymentId;
         request(
-            `https://${'rzp_test_kehCvQHYpkIrTO'}:${'9hFynk38trO5l5iRya52zV4i'}@api.razorpay.com/v1/payments/${paymentID}`,
+            `https://${'rzp_test_kehCvQHYpkIrTO'}:${'9hFynk38trO5l5iRya52zV4i'}@api.razorpay.com/v1/payments/${paymentId}`,
             function (error, response, body) {
                 if (body) {
                     const result = JSON.parse(body);
@@ -182,6 +183,9 @@ router.post('/newapp',authenticate,upload.single('addressProof'), newApplication
 
 //  Verify User's Profile(Hidden:collegeAdmin)
 router.post('/adminverify',authenticate, adminverifyProfilee);
+
+//  Verify User's Profile(Hidden:collegeAdmin)
+router.post('/adminrejectprofile',authenticate, adminRejectProfilee);
 
 //Approove New Application Of User(Hidden:All Admins)
 router.post('/adminapprove',authenticate, adminApproveApp);

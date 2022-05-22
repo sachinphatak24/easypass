@@ -453,6 +453,60 @@ export const adminverifyProfilee = async(req,res) => {
     }
 }
 
+//Post Route For Admin To Reject Unverified Profile & Return All The Verified & UnVerified Profiles
+export const adminRejectProfilee = async(req,res) => {
+    try {
+        Profile.findOne({profileVerifyApplied:true,email:req.body.email,collegeName:req.userInfo.collegeName,profileVerifystatus:'UnVerified'}).then(profileToVerify => {
+            // console.log(req.userInfo.collegeName);
+            if (profileToVerify) {
+                Profile.findOneAndUpdate(
+                    {profileVerifyApplied:true,email:req.body.email},
+                    {$set:{profileVerifystatus:'Rejected',profileVerifyDate:Date().toString()}},
+                    {new: true}
+                    ).then( async profileToVerify => {
+                        console.log(profileToVerify);
+                        console.log(profileToVerify.nameAsPerIdCard);
+                        var mailOptions = {
+                            from: 'easypass24@gmail.com',
+                            to: profileToVerify.email,
+                            subject: 'Profile Verification Rejected!',
+                            text: `
+                    Hi ${profileToVerify.nameAsPerIdCard.charAt(0).toUpperCase()+ profileToVerify.nameAsPerIdCard.slice(1)},
+                            
+                        Your Profile Has Been Rejected!. You Can Edit Or Apply For A New Profile.
+                    
+                    
+                    Thank You!
+                    EasyPass`
+        
+                            };
+                            transporter.sendMail(mailOptions, function(error, info){
+                                if (error) {
+                                    console.log(error);
+                                } else {
+                                    console.log('Email sent: ' + info.response);
+                                }
+                            });   
+        
+                        const unVerifiedProfiles = await Profile.find({profileVerifyApplied:true,collegeName:req.userInfo.collegeName,profileVerifystatus:'UnVerified'});
+                        const verifiedProfiles = await Profile.find({profileVerifyApplied:true, collegeName:req.userInfo.collegeName,profileVerifystatus:'Verified'});
+                        const userType = req.userInfo.type;
+                        if(userType ==='college admin'){
+                           res.json({status:'Successfully Verified!',unVerifiedProfiles,verifiedProfiles});
+                        }else{
+                            res.json({error:'Need Admin Privilages To Access This Route.'});
+                        }
+                    })
+                } else {
+                res.json({ status:404,error:'There is no Profile to be verified And/Or The profile is already verified And/Or Need Admin Privilages'});
+            }
+                   
+        })
+    } catch (error) {
+        res.json({status:400, message:error});
+    }
+}
+
 
 // Get Route for collegeAdmin To View Only UnApproved Applications **
 export const adminUnApprovedProfiles = async(req,res) => {
@@ -768,6 +822,31 @@ export const adminRejectApp = async(req,res) => {
                     {$set:{'applications.currentApplication.applicationStatus':"Rejected",'applications.allApplications.$.applicationStatus':"Rejected",'applications.allApplications.$.applicationRejectedOn':Date().toString(),'applications.currentApplication.applicationRejectedOn':Date().toString()}},
                     {new: true}
                     ).then( async() => {
+                        const currentApp = await Profile.findOne({email:req.body.email});
+                        console.log(currentApp);
+                        console.log(currentApp.nameAsPerIdCard);
+                        var mailOptions = {
+                            from: 'easypass24@gmail.com',
+                            to: currentApp.email,
+                            subject: 'Application Rejected!',
+                            text: `
+                    Hi ${currentApp.nameAsPerIdCard.charAt(0).toUpperCase()+ currentApp.nameAsPerIdCard.slice(1)},
+                            
+                        Your Application Has Been Rejected!.Please Edit It Or Create A New Application.
+                    
+                    
+                    Thank You!
+                    EasyPass`
+        
+                            };
+                            transporter.sendMail(mailOptions, function(error, info){
+                                if (error) {
+                                    console.log(error);
+                                } else {
+                                    console.log('Email sent: ' + info.response);
+                                }
+                            });
+
                         const unapprovedProfiles = await Profile.find({'applications.currentApplication.applicationStatus':"Under Process"});
                         const approvedProfiles = await Profile.find({'applications.currentApplication.applicationStatus':"Approved"});
                         const userType = req.userInfo.type;
