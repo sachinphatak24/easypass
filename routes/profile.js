@@ -26,7 +26,7 @@ var transporter = nodemailer.createTransport({
 // =========================================================
 
 // myApps
-import {allProfiles, myApps, verifyProfile, adminverifyProfile, adminverifyProfilee, createProfile, currentProfile, adminverifyProfileAll, newApplication, pdfGen, adminGetApp, fullProfile, adminUnApprovedProfiles, adminRejectApp, adminApproveApp, allUsers, busPases, railwayPases, proPic} from '../controllers/profiles.js';
+import {allProfiles, myApps, verifyProfile, adminverifyProfile, adminverifyProfilee, createProfile, currentProfile, adminverifyProfileAll, newApplication, pdfGen, adminGetApp, fullProfile, adminUnApprovedProfiles, adminRejectApp, adminApproveApp, allUsers, busPases, railwayPases, proPic, adminRejectProfilee} from '../controllers/profiles.js';
 
 // =================================
 // order Route
