@@ -17,7 +17,7 @@ import Razorpay from 'razorpay';
 // =========================================================
 
 // myApps
-import {allProfiles, myApps, verifyProfile, adminverifyProfile, adminverifyProfilee, createProfile, currentProfile, adminverifyProfileAll, newApplication, pdfGen, adminGetApp, fullProfile, adminUnApprovedProfiles, adminRejectApp, adminApproveApp, allUsers, busPases, railwayPases} from '../controllers/profiles.js';
+import {allProfiles, myApps, verifyProfile, adminverifyProfile, adminverifyProfilee, createProfile, currentProfile, adminverifyProfileAll, newApplication, pdfGen, adminGetApp, fullProfile, adminUnApprovedProfiles, adminRejectApp, adminApproveApp, allUsers, busPases, railwayPases, proPic} from '../controllers/profiles.js';
 
 // =================================
 // order Route
@@ -75,17 +75,11 @@ router.post('/paymentVerify',authenticate, async(req,res) => {
     }
 })
 
-router.get("/payments",authenticate, (req, res) => {
-    // const order = req.body;
-    // console.log(req.body);
-    // order.exec((err, data) => {
-    //   if (err || data == null) {
-    //     return res.json({
-    //       error: "No order Found",
-    //     });
-    //   }
+router.get("/payments",authenticate, async (req, res) => {
     try {
-        const profile = Profile.findOne({email:req.userInfo.email});
+        const profile = await Profile.findOne({email:req.userInfo.email});
+        console.log(profile);
+        console.log(profile.applications.currentApplication.paymentId);
         const paymentID = profile.applications.currentApplication.paymentId;
         request(
             `https://${'rzp_test_kehCvQHYpkIrTO'}:${'9hFynk38trO5l5iRya52zV4i'}@api.razorpay.com/v1/payments/${paymentID}`,
@@ -103,10 +97,10 @@ router.get("/payments",authenticate, (req, res) => {
         } catch (error) {
             res.json({status:500, message: error});
         }
-        });
-        
+});
         
 
+router.post('/profilepic', authenticate, upload.single('profilePic'), proPic);
 
 // =================================
 //GET ROUTES:-

@@ -16,6 +16,8 @@ const profileSchema = mongoose.Schema({
     profileVerifyApplied:{ type: Boolean, default: false },
     profileVerifystatus:{type:String, default:"UnVerified"},
     profileVerifyDate:{type:String},
+    cloudinaryProfileId:{type:String},
+    profilePic:{type:String},
     applications:{
         currentApplication:{
             name:{type:String},
