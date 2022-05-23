@@ -153,18 +153,65 @@ export const currentProfile = async (req,res) => {
         // console.log("cool");
         const profile = await Profile.findOne({user:req.userId}).populate('user');
         if(!profile) return res.json({status:'400',message:'There is no profile for this user. Please Create one at `profile/create`'});
-        const generateQR = async text =>{
-            try {
-                const qr = await QRCode.toDataURL(text);
-                console.log(qr);
-            }catch(err){
-                console.log(err);
+        // const generateQR = async text =>{
+            // try {
+        if(!profile.qrcode){
+
+            const url = "http://google.com";
+            const qrco = await QRCode.toDataURL(url);
+            console.log(qrco);
+            // }catch(err){
+                // console.log(err);
+            // }
+        // }
+        // await generateQR("https://frosty-mayer-4f6474.netlify.app/user/travel-pass/applications/past-applications/62816c4618579eff420c536e");
+        // res.json({status:200, profile, message: "Verified!"});
+        // console.log(qrco);
+        Profile.findOneAndUpdate(
+            {user: req.userId},
+            {$set: {qrcode:qrco}},
+            {new: true}
+        ).then( newprofile => {
+            // console.log(newprofile.qrcode);
+            var mailOptions = {
+                from: 'easypass24@gmail.com',
+                to: newprofile.email,
+                subject: 'PassQR Generated',
+                text: `
+        Hi ${newprofile.nameAsPerIdCard.charAt(0).toUpperCase()+ newprofile.nameAsPerIdCard.slice(1)},
+                
+           Your Pass QRCode Has Been Successfully Generated! Please Find It Attached Below.
+        
+        
+        Thank You!
+        EasyPass`,
+        attachments: [
+            {
+                filename: "PassQR.png",
+                path: newprofile.qrcode, // <-- should be path instead of content
+                cid: "pin-marker.png"
             }
+          ]
+          
+        };
+                transporter.sendMail(mailOptions, function(error, info){
+                    if (error) {
+                        console.log(error);
+                    } else {
+                        console.log('Email sent: ' + info.response);
+                    }
+                });   
+                
+                res.json({status:200, newprofile});
+                
+            }
+            )
+        }else{
+            console.log('qr already generated!');
+            res.json({status:200, profile});
         }
-        generateQR("https://frosty-mayer-4f6474.netlify.app/user/travel-pass/applications/past-applications/62816c4618579eff420c536e");
-        res.json({status:200,profile});
-    } catch(err){
-        res.json({status:'500', error:'Server Error',err});
+        } catch(err){
+            res.json({status:'500', error:'Server Error',err});
     } 
 }
 
@@ -412,6 +459,7 @@ export const adminverifyProfilee = async(req,res) => {
                     ).then( async profileToVerify => {
                         console.log(profileToVerify);
                         console.log(profileToVerify.nameAsPerIdCard);
+                        // const imgurl = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAANQAAADUCAYAAADk3g0YAAAAAklEQVR4AewaftIAAAqISURBVO3BQY7gRpIAQXei/v9l3z7GKQGCWS1pNszsD9ZaVzysta55WGtd87DWuuZhrXXNw1rrmoe11jUPa61rHtZa1zysta55WGtd87DWuuZhrXXNw1rrmoe11jUPa61rfvhI5W+q+ELli4oTlaliUpkqJpWpYlKZKiaVqeJEZaqYVE4qJpWp4kRlqphU/qaKLx7WWtc8rLWueVhrXfPDZRU3qbyhMlW8UTGpnKhMFZPKVHFSMalMFZPKVDGpnFScVJyoTBUnKlPFGxU3qdz0sNa65mGtdc3DWuuaH36ZyhsVb6hMFZPKVPFGxUnFScUXFScVJxWTyqRyUjGpTBWTylTxm1TeqPhND2utax7WWtc8rLWu+eF/XMWJyknFpHJSMalMFZPKVDGpvFFxUnGiclJxUvGGylTxX/aw1rrmYa11zcNa65of/seofFExqUwVJypTxaRyovJvojJVnKj8f/aw1rrmYa11zcNa65offlnF31RxojJVTCpTxaTyRcWkMlW8ofKbKiaVk4q/qeLf5GGtdc3DWuuah7XWNT9cpvJvojJVTCpTxaQyVUwqU8WkMlW8oTJVvKEyVUwqU8WkMlVMKicqU8WkMlWcqPybPay1rnlYa13zsNa65oePKv5NVKaKSeWNipOKk4ovKr6o+CdVnFScVPyXPKy1rnlYa13zsNa6xv7gA5WpYlK5qeINlaliUpkqJpWp4kRlqphUflPFpDJVnKi8UTGpvFFxonJTxW96WGtd87DWuuZhrXXND5epTBWTyhsVN6m8UTGpnFRMKm9UTCpfVPxNFScqk8pUMVWcqJxUTConFV88rLWueVhrXfOw1rrmh8sqJpU3KiaVqeKNikllqphUTipOVKaKSWWqmFROKiaVE5Wp4o2KSWVSmSomlZOKSeWNihOVk4qbHtZa1zysta55WGtdY3/wgcpJxYnKScWkMlXcpDJVTConFb9J5aaKL1SmiknlpGJSOak4UTmp+E0Pa61rHtZa1zysta6xP/hA5aTiC5WbKiaVNyomlS8qTlSmikllqrhJZap4Q2WqeENlqphUpoo3VKaKLx7WWtc8rLWueVhrXfPDRxWTyonKVDGpTBWTylQxqUwVk8pUMalMFScV/6SKm1SmihOVqWKqOFE5qTipOFGZKn7Tw1rrmoe11jUPa61rfvhIZaqYVL5Q+ULlRGWqmFTeqJhUblI5qZhU3qiYVKaKqeJEZao4qZhUpopJ5aRiUpkqbnpYa13zsNa65mGtdc0Pl6mcVEwqJxVfVEwqb1ScqLxR8YbKScVJxaRyojJVTCpvVLyhcqLyhspUMalMFV88rLWueVhrXfOw1rrG/uAilaliUpkqTlROKn6Tyk0Vk8pJxaQyVUwqU8UbKm9UTCpTxRsqJxVfqEwVNz2sta55WGtd87DWuuaHyyomlROVk4o3VKaKN1ROKr5QmSr+SypOKk5U3qj4QmWqmFSmii8e1lrXPKy1rnlYa13zw0cqX1ScqEwVk8pUMamcVEwVk8qJylTxhspJxYnKicobFScqU8Wk8kbFicoXFZPKVHHTw1rrmoe11jUPa61rfvioYlKZKt5QmSomlaliUjmpmFROKiaVqeJE5aRiUvknqZxU/CaVqWJSOamYVP6mh7XWNQ9rrWse1lrX2B98oPJGxaRyU8WkMlW8ofJGxaTyN1VMKlPFGypTxaQyVZyo/JMqJpWp4ouHtdY1D2utax7WWtf8cFnFpDKpnFS8oXJSMalMFZPKGxWTylRxojJVvKEyqZyo3FQxqZxUTCpTxRsq/yYPa61rHtZa1zysta754TKVm1SmijdUpoovKiaVqWJSmSreUJkqTiq+UJkqJpWTihOVN1SmipOKSWVSmSpuelhrXfOw1rrmYa11zQ8fVUwqN1W8oTJVTCpTxUnFpHKiclPFGypfVEwqU8WkMqlMFV9UvKFyUvGbHtZa1zysta55WGtdY3/wF6n8kyomlaniJpWpYlL5TRVfqEwVJyonFZPKb6qYVKaKmx7WWtc8rLWueVhrXfPDRypTxU0VX6i8oTJVvKFyojJVnKhMFZPKVPGFyhcVJyonFZPKScUbFZPKVPHFw1rrmoe11jUPa61rfvhlKlPFicqkclIxqZyonFRMKlPFGxVvqEwVk8pUMancVDGpTBWTyknFpDKpTBVvqLxRcdPDWuuah7XWNQ9rrWt+uExlqnij4m+q+EJlqnhDZaqYVKaKSeWNihOVN1SmihOVk4pJ5aaKSWWq+OJhrXXNw1rrmoe11jU//DKVqWJSeaPijYo3VN6omFROKqaKSWWqOKmYVKaKSeUNlZOKNyq+qJhUpooTld/0sNa65mGtdc3DWuuaHy6reKPib1I5qZhUJpU3Kk5UTlRuqjhR+U0qJxVvVJyo/E0Pa61rHtZa1zysta754ZepTBWTylQxqZxUTBWTyknFpPJGxYnKScWkMlWcqJyoTBWTylQxqXyhMlW8UTGpTBWTyknFb3pYa13zsNa65mGtdY39wS9SOan4QuWk4kRlqphUpoovVE4qJpWTikllqphU3qiYVN6omFSmihOVk4pJ5Y2Kmx7WWtc8rLWueVhrXWN/cJHKScWJyknFGyonFZPKGxUnKl9U/E0qb1R8oTJVnKhMFZPKVPE3Pay1rnlYa13zsNa65oePVN5QOan4TRW/SeWNikllUjmpmFSmikllqvhCZar4QmWqmComlaliUpkqJpWp4ouHtdY1D2utax7WWtf88FHFFyonKm9UvKFyUvFGxRsqJxVvVEwqU8WkMlXcpDJV3FTxhspUcdPDWuuah7XWNQ9rrWt+uEzlpopJZao4qTipmFROVKaKSeWLihOVk4qp4guVqeJE5UTlDZWpYlKZKk4qftPDWuuah7XWNQ9rrWvsDz5QmSpOVE4qJpWp4kTljYpJZaq4SeVvqvg3U/k3qfjiYa11zcNa65qHtdY19gf/YSpTxaRyU8VNKlPFGypTxRcqb1RMKl9UvKFyU8UXD2utax7WWtc8rLWu+eEjlb+pYqo4qThROam4SeUNlaniRGWqmFSmiqniRGVSOamYVN5QmSpOKiaVk4qbHtZa1zysta55WGtd88NlFTepnKhMFZPKGxVfqEwVX1TcVDGpTBWTyhsVk8oXFW+o/JMe1lrXPKy1rnlYa13zwy9TeaPiC5WTihOVqeKNipOKSWVS+aLijYovKm5SualiUvlND2utax7WWtc8rLWu+eF/TMWk8kbFpDJVTCq/qWJSOVGZKt5QeUNlqpgqTlR+k8rf9LDWuuZhrXXNw1rrmh/+n1M5qZhUflPFScUbKicVU8VNKlPFScWkMlV8ofKbHtZa1zysta55WGtd88Mvq/hNFZPKicpUcaJyUvGGyt9UMamcqEwVJyonFZPKicpUMalMFZPKScVvelhrXfOw1rrmYa11jf3BByp/U8WkclJxovKbKr5QeaPiDZWpYlI5qThRuaniRGWqmFSmipse1lrXPKy1rnlYa11jf7DWuuJhrXXNw1rrmoe11jUPa61rHtZa1zysta55WGtd87DWuuZhrXXNw1rrmoe11jUPa61rHtZa1zysta55WGtd83/OpsavhvMO1gAAAABJRU5ErkJggg=="
                         var mailOptions = {
                             from: 'easypass24@gmail.com',
                             to: profileToVerify.email,
@@ -424,7 +472,7 @@ export const adminverifyProfilee = async(req,res) => {
                     
                     Thank You!
                     EasyPass`
-                    // ,
+                    
                             // html:<img src = ""></img>
         
                             };

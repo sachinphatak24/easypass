@@ -18,6 +18,7 @@ const profileSchema = mongoose.Schema({
     profileVerifyDate:{type:String},
     cloudinaryProfileId:{type:String},
     profilePic:{type:String},
+    qrcode:{type:String,default:"Unavailable"},
     applications:{
         currentApplication:{
             name:{type:String},
@@ -36,7 +37,9 @@ const profileSchema = mongoose.Schema({
             amount:{type:String},
             amountPaid:{type:Boolean, default:false},
             paymentId:{type:String},
-            paymentPaidOn:{type:String}
+            paymentPaidOn:{type:String},
+            
+
 
         },
         allApplications:[
