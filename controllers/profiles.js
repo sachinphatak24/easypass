@@ -87,9 +87,11 @@ try {
     }else{
         passfields.passinfo.passStatus = "Expired";
     }
+    console.log(passinfopro);
     passfields.passinfo.passValidity = passInfo[0].travelPassPeriod;
+    passfields.passinfo.profilePic = passinfopro.profilePic;
     passfields.passinfo.passType = passInfo[0].travelOption;
-    passfields.passinfo.passStartDate = new Date.toString();
+    passfields.passinfo.passStartDate = passInfo[0].appliedOn;
     passfields.passinfo.passEndDate = date.toString();
     passfields.passinfo.passRoute = passInfo[0].startLocation+" to " + passInfo[0].endLocation;
 
@@ -992,11 +994,14 @@ export const adminRejectApp = async(req,res) => {
                             for (let i = 0; i < unapprovedProfiles.length; i++) {
                                 unapprovedApps.push(unapprovedProfiles[i].applications.currentApplication);
                             }
-                            let rejectedApps = [];
+                            // let rejectedApps = [];
                             for (let i = 0; i < unapprovedProfiles.length; i++) {
                                 rejectedApps.push(rejectedProfiles[i].applications.currentApplication);
                             }
                                 let approvedApps = [];
+                                for (let i = 0; i < unapprovedProfiles.length; i++) {
+                                    approvedApps.push(rejectedProfiles[i].applications.currentApplication);
+                                }
                         var promises = [];
                         for (let i = 0; i < approvedProfiles.length; i++) {
                             promises.push(

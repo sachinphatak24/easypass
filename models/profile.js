@@ -71,6 +71,7 @@ const profileSchema = mongoose.Schema({
         passType:{type:String},
         passStartDate:{type:String},
         passEndDate:{type:String},
+        profilePic:{type:String},
         passRoute:{type:String}
     }
 });
