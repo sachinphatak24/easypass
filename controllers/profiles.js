@@ -224,18 +224,24 @@ export const currentProfile = async (req,res) => {
         if(!profile) return res.json({status:'400',message:'There is no profile for this user. Please Create one at `profile/create`'});
         // const generateQR = async text =>{
             // try {
+        let passfields = {};
+        passfields.passinfo = {};
+        if((profile.passinfo.passEndDate -  passStartDate)>=0){
+            passfields.passinfo.passStatus = "Active";
+        }else{
+            passfields.passinfo.passStatus = "Expired";
+        }
+        Profile.findOneAndUpdate(
+            {user:req.userId},
+            {$set: passfields},
+            {new:true}
+        )
         if(!profile.qrcode){
 
             const url = "http://google.com";
             const qrco = await QRCode.toDataURL(url);
             console.log(qrco);
-            // }catch(err){
-                // console.log(err);
-            // }
-        // }
-        // await generateQR("https://frosty-mayer-4f6474.netlify.app/user/travel-pass/applications/past-applications/62816c4618579eff420c536e");
-        // res.json({status:200, profile, message: "Verified!"});
-        // console.log(qrco);
+
         Profile.findOneAndUpdate(
             {user: req.userId},
             {$set: {qrcode:qrco}},
@@ -270,12 +276,20 @@ export const currentProfile = async (req,res) => {
                         console.log('Email sent: ' + info.response);
                     }
                 });   
-                console.log(newprofile.passinfo.passEndDate);
+                // console.log(isLater(newprofile.passinfo.passEndDate));
                 res.json({status:200, newprofile});
                 
             }
             )
         }else{
+            // let now = new Date();
+            // console.log(now);
+            // console.log(now.toString());
+            // let won = now.toString();
+            // console.log(won);
+            
+            console.log(profile.passinfo.passEndDate,profile.passinfo.passStartDate)
+            console.log(profile.passinfo.passEndDate<profile.passinfo.passStartDate);
             console.log('qr already generated!');
             res.json({status:200, profile});
         }
