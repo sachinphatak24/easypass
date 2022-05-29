@@ -685,7 +685,7 @@ export const adminGetApp = async(req,res) => {
                     )
                 }
                 Promise.all(promises).then(() => {
-                    return res.json({status:200, unapprovedApps,approvedApps,rejectedApps});
+                    return res.json({status:200, unapprovedApps,approvedApps});
                 })
         }else{
             res.json({erroMsg:'Need Admin Privilages To Access This Route.'});
