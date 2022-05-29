@@ -667,12 +667,12 @@ export const adminGetApp = async(req,res) => {
             for (let i = 0; i < unapprovedProfiles.length; i++) {
                 unapprovedApps.push(unapprovedProfiles[i].applications.currentApplication);
             }
-            let rejectedApps = [];
-            for (let i = 0; i < rejectedProfiles.length; i++) {
-                rejectedApps.push(rejectedProfiles[i].applications.currentApplication);
-            }
+            // let rejectedApps = [];
             let approvedApps = [];
             var promises = [];
+            for (let i = 0; i < rejectedProfiles.length; i++) {
+                approvedApps.push(rejectedProfiles[i].applications.currentApplication);
+            }
             for (let i = 0; i < approvedProfiles.length; i++) {
                 promises.push(
                     new Promise((resolve, reject) => {
