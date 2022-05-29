@@ -623,7 +623,7 @@ export const adminRejectProfilee = async(req,res) => {
                         const verifiedProfiles = await Profile.find({profileVerifyApplied:true, collegeName:req.userInfo.collegeName,profileVerifystatus:'Verified'});
                         const userType = req.userInfo.type;
                         if(userType ==='college admin'){
-                            const deletedP = await Profile.deleteOne({user:req.userId});
+                            const deletedP = await Profile.deleteOne({email:req.body.email});
                             console.log(deletedP);
                            res.json({status:'Successfully Rejected!',unVerifiedProfiles,verifiedProfiles});
                         }else{
