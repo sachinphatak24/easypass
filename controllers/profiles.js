@@ -5,7 +5,6 @@ import User from '../models/user.js';
 
 import QRCode from 'qrcode';
 import nodemailer from 'nodemailer';
-import profile from '../models/profile.js';
 // import Razorpay from 'razorpay'; 
 
 // ==========================
@@ -57,7 +56,75 @@ export const proPic = async(req,res) => {
     }
 }
 
+export const passInfoCreate = async(req,res) => {
+try {
+    const passinfopro = await Profile.findOne({user:req.userId});
+    let passInfo = [];
+    passInfo.push(passinfopro.applications.currentApplication);
+    console.log(passInfo[0]);        
+    const current = new Date();
+    console.log("runing");
+    const validity = passInfo[0].travelPassPeriod.charAt(0);
+    const val = Number(validity);
+    console.log("runing");
+    const date = new Date()
+    date.setMonth(date.getMonth() + val);      
+    console.log("runing");
+    console.log('tis is '+date);
+    console.log((date -  current)>0);  // true
+    // d1 <= d2; // true
+    // d1 >  d2; // false
+    // d1 >= d2; // false
+    // console.log(currentDate.toString());
+    // console.log(expDate);
+    // applicationFields.applications.currentApplication.validTill=date.toString();
+    
 
+    let passfields = {};
+    passfields.passinfo = {};
+    if((date -  current)>=0){
+        passfields.passinfo.passStatus = "Active";
+    }else{
+        passfields.passinfo.passStatus = "Expired";
+    }
+    passfields.passinfo.passValidity = passInfo[0].travelPassPeriod;
+    passfields.passinfo.passType = passInfo[0].travelOption;
+    passfields.passinfo.passStartDate = new Date.toString();
+    passfields.passinfo.passEndDate = date.toString();
+    passfields.passinfo.passRoute = passInfo[0].startLocation+" to " + passInfo[0].endLocation;
+
+    // res.json({status:200,resp:"COOL"});
+    Profile.findOne({user:req.userId}).then(profilee => {
+        if(profilee){
+            Profile.findOneAndUpdate(
+                {user: req.userId},
+                {$set: passfields},
+                {new: true}
+                ).then(profilee =>res.json({status:200,profilee}));
+            }else{
+                // Create
+                res.json({status:400,Message:"Please Create a Profile First"});
+                // new Profile(profileFields).save().then(profilee => res.json({status:200,profilee}));
+            }    
+        });
+
+} catch (error) {
+    res.json({status:500, message:error});
+}
+};
+
+
+export const deleteAccount = async(req,res) => {
+    try {
+        const delP = await Profile.deleteOne({email:req.userInfo.email});
+        console.log(req.userInfo.email);
+        const delU = await User.deleteOne({email:req.userInfo.email});
+        console.log(delP,delU)
+        res.json({status:200,response:"Account Successully Deleted!"});
+    } catch (error) {
+        res.json({status:500,message:error});
+    }
+}
 
 //-----------------------USER ROUTES--------------------------
 
@@ -229,11 +296,24 @@ export const newApplication = async(req,res) => {
         
         applicationFields.applications.currentApplication.name = req.userInfo.name;
         applicationFields.applications.currentApplication.email = req.userInfo.email;
-
         applicationFields.applications.currentApplication.applicationStatus = 'Under Process';
         applicationFields.applications.currentApplication.addressProof=result.secure_url;
         if(travelPassPeriod) applicationFields.applications.currentApplication.travelPassPeriod = travelPassPeriod;
         applicationFields.applications.currentApplication.appliedOn=Date().toString();
+        // const validity = req.body.travelPassPeriod.charAt(0);
+        // const current = new Date();
+        // const val = Number(validity);
+        // const date = new Date()
+        // date.setMonth(date.getMonth() + val);      
+        // console.log('tis is '+date);
+        // console.log(date -  current);  // true
+        // d1 <= d2; // true
+        // d1 >  d2; // false
+        // d1 >= d2; // false
+        // console.log(currentDate.toString());
+        // console.log(expDate);
+        
+        // applicationFields.applications.currentApplication.validTill=date.toString();
 
         // Update
         Profile.findOne({user:req.userId}).then( async profilee => {  
@@ -248,7 +328,8 @@ export const newApplication = async(req,res) => {
                 travelPassPeriod:travelPassPeriod,
                 applicationStatus:"Under Process",
                 addressProof:result.secure_url,
-                appliedOn:Date().toString(),
+                appliedOn:Date().toString()
+                // validTill:dae.toString()
 
 
             };
@@ -514,8 +595,6 @@ export const adminRejectProfilee = async(req,res) => {
                     {$set:{profileVerifystatus:'Rejected',profileVerifyDate:Date().toString()}},
                     {new: true}
                     ).then( async profileToVerify => {
-                        console.log(profileToVerify);
-                        console.log(profileToVerify.nameAsPerIdCard);
                         var mailOptions = {
                             from: 'easypass24@gmail.com',
                             to: profileToVerify.email,
@@ -523,7 +602,7 @@ export const adminRejectProfilee = async(req,res) => {
                             text: `
                     Hi ${profileToVerify.nameAsPerIdCard.charAt(0).toUpperCase()+ profileToVerify.nameAsPerIdCard.slice(1)},
                             
-                        Your Profile Has Been Rejected!. You Can Edit Or Apply For A New Profile.
+                        Your Profile Has Been Rejected!. Please Apply For A New Profile.
                     
                     
                     Thank You!
@@ -536,12 +615,14 @@ export const adminRejectProfilee = async(req,res) => {
                                 } else {
                                     console.log('Email sent: ' + info.response);
                                 }
-                            });   
+                            });
         
                         const unVerifiedProfiles = await Profile.find({profileVerifyApplied:true,collegeName:req.userInfo.collegeName,profileVerifystatus:'UnVerified'});
                         const verifiedProfiles = await Profile.find({profileVerifyApplied:true, collegeName:req.userInfo.collegeName,profileVerifystatus:'Verified'});
                         const userType = req.userInfo.type;
                         if(userType ==='college admin'){
+                            const deletedP = await Profile.deleteOne({'user':req.userId});
+                            console.log(deletedP);
                            res.json({status:'Successfully Verified!',unVerifiedProfiles,verifiedProfiles});
                         }else{
                             res.json({error:'Need Admin Privilages To Access This Route.'});
@@ -577,11 +658,16 @@ export const adminGetApp = async(req,res) => {
     try {
         const unapprovedProfiles = await Profile.find({collegeName:req.userInfo.collegeName,'applications.currentApplication.applicationStatus':'Under Process'});
         const approvedProfiles = await Profile.find({collegeName:req.userInfo.collegeName,'applications.allApplications.applicationStatus':'Approved'});
+        const rejectedProfiles = await Profile.find({collegeName:req.userInfo.collegeName,'applications.allApplications.applicationStatus':'Rejected'});
         const userType = req.userInfo.type;
         if(userType ==='college admin'){
             let unapprovedApps = [];
             for (let i = 0; i < unapprovedProfiles.length; i++) {
                 unapprovedApps.push(unapprovedProfiles[i].applications.currentApplication);
+            }
+            let rejectedApps = [];
+            for (let i = 0; i < rejectedProfiles.length; i++) {
+                rejectedApps.push(rejectedProfiles[i].applications.currentApplication);
             }
             let approvedApps = [];
             var promises = [];
@@ -597,7 +683,7 @@ export const adminGetApp = async(req,res) => {
                     )
                 }
                 Promise.all(promises).then(() => {
-                    return res.json({status:200, unapprovedApps,approvedApps});
+                    return res.json({status:200, unapprovedApps,approvedApps,rejectedApps});
                 })
         }else{
             res.json({erroMsg:'Need Admin Privilages To Access This Route.'});
@@ -899,13 +985,18 @@ export const adminRejectApp = async(req,res) => {
 
                         const unapprovedProfiles = await Profile.find({'applications.currentApplication.applicationStatus':"Under Process"});
                         const approvedProfiles = await Profile.find({'applications.currentApplication.applicationStatus':"Approved"});
+                        const rejectedProfiles = await Profile.find({'applications.currentApplication.applicationStatus':"Rejected"});
                         const userType = req.userInfo.type;
                         if(userType ==='college admin'){
                             let unapprovedApps = [];
                             for (let i = 0; i < unapprovedProfiles.length; i++) {
-                            unapprovedApps.push(unapprovedProfiles[i].applications.currentApplication);
-                        }
-                        let approvedApps = [];
+                                unapprovedApps.push(unapprovedProfiles[i].applications.currentApplication);
+                            }
+                            let rejectedApps = [];
+                            for (let i = 0; i < unapprovedProfiles.length; i++) {
+                                rejectedApps.push(rejectedProfiles[i].applications.currentApplication);
+                            }
+                                let approvedApps = [];
                         var promises = [];
                         for (let i = 0; i < approvedProfiles.length; i++) {
                             promises.push(
@@ -919,7 +1010,7 @@ export const adminRejectApp = async(req,res) => {
                             )
                         }
                         Promise.all(promises).then(() => {
-                            return res.json({status:200,message:'Successfully Rejected!', unapprovedApps,approvedApps});
+                            return res.json({status:200,message:'Successfully Rejected!', unapprovedApps,approvedApps,rejectedApps});
                         })
                         //    res.json({status:'Successfully Verified!',unApprovedProfiles,approveddProfiles});
                         }else{

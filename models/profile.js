@@ -28,6 +28,7 @@ const profileSchema = mongoose.Schema({
             applicationRejectedOn:{type:String},
             applicationStatus:{type:String},
             appliedOn:{type:String},
+            // validTill:{type:String},
             travelOption:{type:String},
             startLocation:{type:String},
             endLocation:{type:String},
@@ -53,6 +54,7 @@ const profileSchema = mongoose.Schema({
             travelPassPeriod:{type:String},
             applicationStatus:{type:String},
             appliedOn:{type:String},
+            // validTill:{type:String},
             addressProof:{type:String},
             applicationRejectedOn:{type:String},
             applicationAcceptedOn:{type:String},
@@ -63,11 +65,14 @@ const profileSchema = mongoose.Schema({
             paymentPaidOn:{type:String}
         }],
     },
-        passinfo:[{
+    passinfo:{
+        passStatus:{type:String},
+        passValidity:{type:String},
         passType:{type:String},
-        passVerifyStatus:{type:String,default:'UnVerified'},
-        passApproveStatus:{type:String,default:'UnApproved'},
-    }]
+        passStartDate:{type:String},
+        passEndDate:{type:String},
+        passRoute:{type:String}
+    }
 });
 
 export default mongoose.model('Profile', profileSchema);

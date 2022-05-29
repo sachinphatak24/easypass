@@ -26,7 +26,7 @@ var transporter = nodemailer.createTransport({
 // =========================================================
 
 // myApps
-import {allProfiles, myApps, verifyProfile, adminverifyProfile, adminverifyProfilee, createProfile, currentProfile, adminverifyProfileAll, newApplication, pdfGen, adminGetApp, fullProfile, adminUnApprovedProfiles, adminRejectApp, adminApproveApp, allUsers, busPases, railwayPases, proPic, adminRejectProfilee} from '../controllers/profiles.js';
+import {allProfiles, passInfoCreate, myApps, verifyProfile, adminverifyProfile, adminverifyProfilee, createProfile, currentProfile, adminverifyProfileAll, newApplication, pdfGen, adminGetApp, fullProfile, adminUnApprovedProfiles, adminRejectApp, adminApproveApp, allUsers, busPases, railwayPases, proPic, adminRejectProfilee, deleteAccount} from '../controllers/profiles.js';
 
 // =================================
 // order Route
@@ -133,6 +133,8 @@ router.post("/payments",authenticate, async (req, res) => {
         
 
 router.post('/profilepic', authenticate, upload.single('profilePic'), proPic);
+router.post('/deleteaccount', authenticate, deleteAccount);
+router.post('/passinfo',authenticate, passInfoCreate);
 
 // =================================
 //GET ROUTES:-
