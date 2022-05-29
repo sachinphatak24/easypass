@@ -625,7 +625,7 @@ export const adminRejectProfilee = async(req,res) => {
                         if(userType ==='college admin'){
                             const deletedP = await Profile.deleteOne({'user':req.userId});
                             console.log(deletedP);
-                           res.json({status:'Successfully Verified!',unVerifiedProfiles,verifiedProfiles});
+                           res.json({status:'Successfully Rejected!',unVerifiedProfiles,verifiedProfiles});
                         }else{
                             res.json({error:'Need Admin Privilages To Access This Route.'});
                         }
