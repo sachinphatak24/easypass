@@ -995,13 +995,13 @@ export const adminRejectApp = async(req,res) => {
                                 unapprovedApps.push(unapprovedProfiles[i].applications.currentApplication);
                             }
                             // let rejectedApps = [];
-                            for (let i = 0; i < unapprovedProfiles.length; i++) {
-                                rejectedApps.push(rejectedProfiles[i].applications.currentApplication);
+                            // for (let i = 0; i < rejectedProfiles.length; i++) {
+                                // rejectedApps.push(rejectedProfiles[i].applications.currentApplication);
+                            // }
+                            let approvedApps = [];
+                            for (let i = 0; i < rejectedProfiles.length; i++) {
+                                approvedApps.push(rejectedProfiles[i].applications.currentApplication);
                             }
-                                let approvedApps = [];
-                                for (let i = 0; i < unapprovedProfiles.length; i++) {
-                                    approvedApps.push(rejectedProfiles[i].applications.currentApplication);
-                                }
                         var promises = [];
                         for (let i = 0; i < approvedProfiles.length; i++) {
                             promises.push(
