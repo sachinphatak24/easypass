@@ -999,10 +999,11 @@ export const adminRejectApp = async(req,res) => {
                                 // rejectedApps.push(rejectedProfiles[i].applications.currentApplication);
                             // }
                             let approvedApps = [];
-                            for (let i = 0; i < rejectedProfiles.length; i++) {
-                                approvedApps.push(rejectedProfiles[i].applications.currentApplication);
-                            }
+                            
                         var promises = [];
+                        for (let i = 0; i < rejectedProfiles.length; i++) {
+                            approvedApps.push(rejectedProfiles[i].applications.currentApplication);
+                        }
                         for (let i = 0; i < approvedProfiles.length; i++) {
                             promises.push(
                                 new Promise((resolve, reject) => {
@@ -1015,7 +1016,7 @@ export const adminRejectApp = async(req,res) => {
                             )
                         }
                         Promise.all(promises).then(() => {
-                            return res.json({status:200,message:'Successfully Rejected!', unapprovedApps,approvedApps,rejectedApps});
+                            return res.json({status:200,message:'Successfully Rejected!', unapprovedApps,approvedApps});
                         })
                         //    res.json({status:'Successfully Verified!',unApprovedProfiles,approveddProfiles});
                         }else{
