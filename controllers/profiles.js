@@ -1206,7 +1206,7 @@ export const busPases = async(req,res) => {
                 promises.push(
                     new Promise((resolve, reject) => {
                         for(let j= 0; j<approvedBusProfiles[i].applications.allApplications.length; j++){
-                            if(approvedBusProfiles[i].applications.allApplications[j].amountPaid==true)
+                            if(approvedBusProfiles[i].applications.allApplications[j].amountPaid==true && approvedBusProfiles[i].applications.allApplications[j].passGiven==true)
                             approvedBusApps.push(approvedBusProfiles[i].applications.allApplications[j]);
                             resolve()
                         }
@@ -1296,7 +1296,7 @@ export const busPassApprove = async(req,res) => {
                                 promises.push(
                                     new Promise((resolve, reject) => {
                                         for(let j= 0; j<approvedBusProfiles[i].applications.allApplications.length; j++){
-                                            if(approvedBusProfiles[i].applications.allApplications[j].passGiven==true)
+                                            if(approvedBusProfiles[i].applications.allApplications[j].amountPaid==true && approvedBusProfiles[i].applications.allApplications[j].passGiven==true)
                                             // approvedBusApps.push(approvedBusProfiles[i].profilePic);
                                             approvedBusApps.push(approvedBusProfiles[i].applications.allApplications[j]);
                                             resolve()
