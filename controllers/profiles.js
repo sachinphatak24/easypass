@@ -1105,7 +1105,7 @@ export const railwayPassApprove = async(req,res) => {
             if (profileToVerify) {
                 Profile.findOneAndUpdate(
                     {'applications.currentApplication.travelOption':'Local / Train','applications.currentApplication.amountPaid':true,'applications.currentApplication.passGiven':false,email:req.body.email},
-                    {$set:{'applications.currentApplication.passGiven':true}},
+                    {$set:{'applications.currentApplication.passGiven':true,'applications.allApplications.0.passGiven':true}},
                     {new: true}
                     ).then( async profileToVerify => {
                         const unapprovedRailProfiles = await Profile.find({'applications.currentApplication.travelOption':'Local / Train','applications.currentApplication.amountPaid':true,'applications.currentApplication.passGiven':false});
@@ -1190,7 +1190,7 @@ export const busPassApprove = async(req,res) => {
             if (profileToVerify) {
                 Profile.findOneAndUpdate(
                     {'applications.currentApplication.amountPaid':true,'applications.currentApplication.travelOption':'PMPML / Bus','applications.currentApplication.passGiven':false,email:req.body.email},
-                    {$set:{'applications.currentApplication.passGiven':true}},
+                    {$set:{'applications.currentApplication.passGiven':true,'applications.allApplications.0.passGiven':true}},
                     {new: true}
                     ).then( async profileToVerify => {
                         const unapprovedRailProfiles = await Profile.find({'applications.currentApplication.travelOption':'PMPML / Bus','applications.currentApplication.amountPaid':true,'applications.currentApplication.passGiven':false});

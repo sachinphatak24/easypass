@@ -205,7 +205,7 @@ router.post('/railwaypassapprove',authenticate,railwayPassApprove);
 
 // ---------------------BUS ADMIN Route------------------------ 
 router.get('/busPasses',authenticate,busPases);
-router.get('/busPassaprove',authenticate,busPassApprove);
+router.post('/buspassapprove',authenticate,busPassApprove);
 
 
 //Download Concession Letter
