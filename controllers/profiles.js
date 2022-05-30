@@ -472,7 +472,7 @@ export const allUsers = async(req,res) => {
         const Users = await User.find();
         const userType = req.userInfo.type;
         // console.log(userType);
-        if(userType === 'bus admin' || userType==='college admin' || userType==='railway admin'){
+        if(userType === 'bus admin' || userType==='college admin' || userType==='train admin'){
             return res.json({status:200,Users});
         }else{
             res.json({erroMsg:'Need Admin Privilages To Access This Route.'});
@@ -488,7 +488,7 @@ export const allProfiles = async(req,res) => {
         const profiles = await Profile.find();
         const userType = req.userInfo.type;
         // console.log(userType);
-        if(userType === 'bus admin' || userType==='college admin' || userType==='railway admin'){
+        if(userType === 'bus admin' || userType==='college admin' || userType==='train admin'){
             return res.json({status:200,profiles});
         }else{
             res.json({erroMsg:'Need Admin Privilages To Access This Route.'});
@@ -1195,7 +1195,7 @@ export const busPases = async(req,res) => {
         const approvedBusProfiles = await Profile.find({'applications.currentApplication.travelOption':'PMPML / Bus','applications.allApplications.passGiven':true,'applications.currentApplication.amountPaid':true});
         const userType = req.userInfo.type;
         console.log(unapprovedBusProfiles,approvedBusProfiles)
-        if(userType === 'bus admin' || userType==='college admin' || userType==='railway admin'){
+        if(userType === 'bus admin' || userType==='college admin' || userType==='train admin'){
             let unapprovedBusApps = [];
             for (let i = 0; i < unapprovedBusProfiles.length; i++) {
                 unapprovedBusApps.push(unapprovedBusProfiles[i].applications.currentApplication);
@@ -1285,7 +1285,7 @@ export const busPassApprove = async(req,res) => {
                         const unapprovedBusProfiles = await Profile.find({'applications.currentApplication.travelOption':'PMPML / Bus','applications.currentApplication.amountPaid':true,'applications.currentApplication.passGiven':false});
                         const approvedBusProfiles = await Profile.find({'applications.currentApplication.travelOption':'PMPML / Bus','applications.currentApplication.amountPaid':true,'applications.allApplications.passGiven':true});
                         const userType = req.userInfo.type;
-                        if(userType === 'bus admin' || userType==='college admin' || userType==='railway admin'){
+                        if(userType === 'bus admin' || userType==='college admin' || userType==='train admin'){
                             let unapprovedBusApps = [];
                             for (let i = 0; i < unapprovedBusProfiles.length; i++) {
                                 unapprovedBusApps.push(unapprovedBusProfiles[i].applications.currentApplication);
