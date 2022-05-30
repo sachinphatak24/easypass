@@ -1096,6 +1096,32 @@ export const railwayPassApprove = async(req,res) => {
                         // ========================================================================================
                         // const passinfopro = await Profile.findOne({user:req.userId});
                         console.log(profileToVerify);
+                        // const currentApp = await Profile.findOne({email:req.body.email});
+                        // console.log(currentApp);
+                        // console.log(currentApp.nameAsPerIdCard);
+                        var mailOptions = {
+                            from: 'easypass24@gmail.com',
+                            to: profileToVerify.email,
+                            subject: 'Pass Verification Done!',
+                            text: `
+                    Hi ${profileToVerify.nameAsPerIdCard.charAt(0).toUpperCase()+ profileToVerify.nameAsPerIdCard.slice(1)},
+                            
+                        Your Application Has Been Succesfully Verified & Accepted!. You Can Now Get Your Pass on the Website!
+                    
+                    
+                    Thank You!
+                    Happy journey!
+                    EasyPass`
+        
+                            };
+                            transporter.sendMail(mailOptions, function(error, info){
+                                if (error) {
+                                    console.log(error);
+                                } else {
+                                    console.log('Email sent: ' + info.response);
+                                }
+                            });
+
                         let passInfo = [];
                         passInfo.push(profileToVerify.applications.currentApplication);
                         console.log(passInfo);
@@ -1237,6 +1263,29 @@ export const busPassApprove = async(req,res) => {
                         // ========================================================================================
                         // const passinfopro = await Profile.findOne({user:req.userId});
                         console.log(profileToVerify);
+                        var mailOptions = {
+                            from: 'easypass24@gmail.com',
+                            to: profileToVerify.email,
+                            subject: 'Pass Verification Done!',
+                            text: `
+                    Hi ${profileToVerify.nameAsPerIdCard.charAt(0).toUpperCase()+ profileToVerify.nameAsPerIdCard.slice(1)},
+                            
+                        Your Application Has Been Succesfully Verified & Accepted!. You Can Now Get Your Pass on the Website!
+                    
+                    
+                    Thank You!
+                    Happy journey!
+                    EasyPass`
+        
+                            };
+                            transporter.sendMail(mailOptions, function(error, info){
+                                if (error) {
+                                    console.log(error);
+                                } else {
+                                    console.log('Email sent: ' + info.response);
+                                }
+                            });
+
                         let passInfo = [];
                         passInfo.push(profileToVerify.applications.currentApplication);
                         console.log(passInfo);
