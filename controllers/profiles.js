@@ -224,18 +224,18 @@ export const currentProfile = async (req,res) => {
         if(!profile) return res.json({status:'400',message:'There is no profile for this user. Please Create one at `profile/create`'});
         // const generateQR = async text =>{
             // try {
-        let passfields = {};
-        passfields.passinfo = {};
-        if((profile.passinfo.passEndDate -  passStartDate)>=0){
-            passfields.passinfo.passStatus = "Active";
-        }else{
-            passfields.passinfo.passStatus = "Expired";
-        }
-        Profile.findOneAndUpdate(
-            {user:req.userId},
-            {$set: passfields},
-            {new:true}
-        )
+        // let passfields = {};
+        // passfields.passinfo = {};
+        // if((profile.passinfo.passEndDate -  passStartDate)>=0){
+        //     passfields.passinfo.passStatus = "Active";
+        // }else{
+        //     passfields.passinfo.passStatus = "Expired";
+        // }
+        // Profile.findOneAndUpdate(
+        //     {user:req.userId},
+        //     {$set: passfields},
+        //     {new:true}
+        // )
         if(!profile.qrcode){
 
             const url = "http://google.com";
