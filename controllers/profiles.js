@@ -312,6 +312,7 @@ export const newApplication = async(req,res) => {
         
         applicationFields.applications.currentApplication.name = req.userInfo.name;
         applicationFields.applications.currentApplication.email = req.userInfo.email;
+        applicationFields.applications.currentApplication.passGiven = false;
         applicationFields.applications.currentApplication.applicationStatus = 'Under Process';
         applicationFields.applications.currentApplication.addressProof=result.secure_url;
         if(travelPassPeriod) applicationFields.applications.currentApplication.travelPassPeriod = travelPassPeriod;
@@ -1065,6 +1066,7 @@ export const railwayPases = async(req,res) => {
         const unapprovedRailProfiles = await Profile.find({'applications.currentApplication.travelOption':'Local / Train','applications.currentApplication.amountPaid':true,'applications.currentApplication.passGiven':false});
         const approvedRailProfiles = await Profile.find({'applications.currentApplication.travelOption':'Local / Train','applications.currentApplication.amountPaid':true,'applications.allApplications.passGiven':true});
         const userType = req.userInfo.type;
+        console.log(unapprovedRailProfiles,approvedRailProfiles);
         if(userType === 'bus admin' || userType==='college admin' || userType==='railway admin'){
             let unapprovedRailApps = [];
             for (let i = 0; i < unapprovedRailProfiles.length; i++) {
@@ -1151,6 +1153,7 @@ export const busPases = async(req,res) => {
         const unapprovedBusProfiles = await Profile.find({'applications.currentApplication.travelOption':'PMPML / Bus','applications.currentApplication.passGiven':false,'applications.currentApplication.amountPaid':true});
         const approvedBusProfiles = await Profile.find({'applications.currentApplication.travelOption':'PMPML / Bus','applications.allApplications.passGiven':true,'applications.currentApplication.amountPaid':true});
         const userType = req.userInfo.type;
+        console.log(unapprovedBusProfiles,approvedBusProfiles)
         if(userType === 'bus admin' || userType==='college admin' || userType==='railway admin'){
             let unapprovedBusApps = [];
             for (let i = 0; i < unapprovedBusProfiles.length; i++) {
