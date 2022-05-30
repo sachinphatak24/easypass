@@ -40,8 +40,8 @@ const profileSchema = mongoose.Schema({
             paymentId:{type:String},
             paymentPaidOn:{type:String},
             
-            passGiven:{type:Boolean, default:false}
-
+            passGiven:{type:Boolean, default:false},
+            passGivenDate:{type:String}
 
         },
         allApplications:[
@@ -65,12 +65,14 @@ const profileSchema = mongoose.Schema({
             paymentId:{type:String},
             paymentPaidOn:{type:String},
 
-            passGiven:{type:Boolean, default:false}
+            passGiven:{type:Boolean, default:false},
+            passGivenDate:{type:String}
 
         }],
     },
     passinfo:{
         passStatus:{type:String},
+        passGivenDate:{type:String},
         passValidity:{type:String},
         passType:{type:String},
         passStartDate:{type:String},

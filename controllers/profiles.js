@@ -61,25 +61,11 @@ try {
     const passinfopro = await Profile.findOne({user:req.userId});
     let passInfo = [];
     passInfo.push(passinfopro.applications.currentApplication);
-    console.log(passInfo[0]);        
     const current = new Date();
-    console.log("runing");
     const validity = passInfo[0].travelPassPeriod.charAt(0);
     const val = Number(validity);
-    console.log("runing");
     const date = new Date()
     date.setMonth(date.getMonth() + val);      
-    console.log("runing");
-    console.log('tis is '+date);
-    console.log((date -  current)>0);  // true
-    // d1 <= d2; // true
-    // d1 >  d2; // false
-    // d1 >= d2; // false
-    // console.log(currentDate.toString());
-    // console.log(expDate);
-    // applicationFields.applications.currentApplication.validTill=date.toString();
-    
-
     let passfields = {};
     passfields.passinfo = {};
     if((date -  current)>=0){
@@ -1101,13 +1087,60 @@ export const railwayPases = async(req,res) => {
 export const railwayPassApprove = async(req,res) => {
     try {
         Profile.findOne({'applications.currentApplication.travelOption':'Local / Train','applications.currentApplication.amountPaid':true,email:req.body.email,'applications.currentApplication.passGiven':false}).then(profileToVerify => {
-            // console.log(req.userInfo.collegeName);
             if (profileToVerify) {
                 Profile.findOneAndUpdate(
                     {'applications.currentApplication.travelOption':'Local / Train','applications.currentApplication.amountPaid':true,'applications.currentApplication.passGiven':false,email:req.body.email},
-                    {$set:{'applications.currentApplication.passGiven':true,'applications.allApplications.0.passGiven':true}},
+                    {$set:{'applications.currentApplication.passGiven':true,'applications.currentApplication.passGivenDate':Date().toString(),'applications.allApplications.0.passGiven':true,'applications.allApplications.0.passGivenDate':Date().toString()}},
                     {new: true}
                     ).then( async profileToVerify => {
+                        // ========================================================================================
+                        // const passinfopro = await Profile.findOne({user:req.userId});
+                        console.log(profileToVerify);
+                        let passInfo = [];
+                        passInfo.push(profileToVerify.applications.currentApplication);
+                        console.log(passInfo);
+                        const current = new Date();
+                        const validity = passInfo[0].travelPassPeriod.charAt(0);
+                        const val = Number(validity);
+                        const date = new Date()
+                        date.setMonth(date.getMonth() + val);      
+                        let passfields = {};
+                        passfields.passinfo = {};
+                        if((date -  current)>=0){
+                            passfields.passinfo.passStatus = "Active";
+                        }else{
+                            passfields.passinfo.passStatus = "Expired";
+                        }
+                        // console.log(passinfo);
+                        console.log(passInfo);
+                        passfields.passinfo.passValidity = passInfo[0].travelPassPeriod;
+                        passfields.passinfo.profilePic = profileToVerify.profilePic;
+                        passfields.passinfo.passType = passInfo[0].travelOption;
+                        passfields.passinfo.passStartDate = passInfo[0].appliedOn;
+                        passfields.passinfo.passGivenDate = Date().toString();
+                        passfields.passinfo.passEndDate = date.toString();
+                        passfields.passinfo.passRoute = passInfo[0].startLocation+" to " + passInfo[0].endLocation;
+                        // console.log(passfields);
+                        // res.json({status:200,resp:"COOL"});
+                        if (profileToVerify.applications.currentApplication.passGiven == true) {
+                            console.log("ruunni")
+                            Profile.findOne({email:req.body.email}).then(profilee => {
+                                console.log("haa ha:- "+profilee);
+                                if(profilee){
+                                    Profile.findOneAndUpdate(
+                                    {email: req.body.email},
+                                    {$set: passfields},
+                                    {new: true}
+                                    ).then( async() => {
+
+                                        // }else{
+                                            // Create
+                                            // res.json({status:400,Message:"Please Create a Profile First"});
+                                            // new Profile(profileFields).save().then(profilee => res.json({status:200,profilee}));
+                                            
+                                            
+                                            console.log("Not in IF");
+                        // ========================================================================================
                         const unapprovedRailProfiles = await Profile.find({'applications.currentApplication.travelOption':'Local / Train','applications.currentApplication.amountPaid':true,'applications.currentApplication.passGiven':false});
                         const approvedRailProfiles = await Profile.find({'applications.currentApplication.travelOption':'Local / Train','applications.currentApplication.amountPaid':true,'applications.allApplications.passGiven':true});
                         const userType = req.userInfo.type;
@@ -1133,12 +1166,20 @@ export const railwayPassApprove = async(req,res) => {
                                 Promise.all(promises).then(() => {
                                     return res.json({status:200, unapprovedRailApps,approvedRailApps});
                                 })
-                        }else{
-                            res.json({erroMsg:'Need Admin Privilages To Access This Route.'});
+                            }else{
+                                res.json({erroMsg:'Need Admin Privilages To Access This Route.'});
+                            }
+                            
+                        })}else{
+                            res.json({status:400,message:"No matching Application found / The Applicaion is already approved!"});
                         }
-                    
-                    })}
-})
+                    })
+                    }    
+        });
+        }else{
+            res.json({status:400,Message:"No Profile Found!"});
+        }
+                    })
 
 } catch (error) {
         res.json({status:500, Message:error});
@@ -1190,46 +1231,101 @@ export const busPassApprove = async(req,res) => {
             if (profileToVerify) {
                 Profile.findOneAndUpdate(
                     {'applications.currentApplication.amountPaid':true,'applications.currentApplication.travelOption':'PMPML / Bus','applications.currentApplication.passGiven':false,email:req.body.email},
-                    {$set:{'applications.currentApplication.passGiven':true,'applications.allApplications.0.passGiven':true}},
+                    {$set:{'applications.currentApplication.passGiven':true,'applications.currentApplication.passGivenDate':Date().toString(),'applications.allApplications.0.passGiven':true,'applications.allApplications.0.passGivenDate':Date().toString()}},
                     {new: true}
                     ).then( async profileToVerify => {
-                        const unapprovedRailProfiles = await Profile.find({'applications.currentApplication.travelOption':'PMPML / Bus','applications.currentApplication.amountPaid':true,'applications.currentApplication.passGiven':false});
-                        const approvedRailProfiles = await Profile.find({'applications.currentApplication.travelOption':'PMPML / Bus','applications.currentApplication.amountPaid':true,'applications.allApplications.passGiven':true});
+                        // ========================================================================================
+                        // const passinfopro = await Profile.findOne({user:req.userId});
+                        console.log(profileToVerify);
+                        let passInfo = [];
+                        passInfo.push(profileToVerify.applications.currentApplication);
+                        console.log(passInfo);
+                        const current = new Date();
+                        const validity = passInfo[0].travelPassPeriod.charAt(0);
+                        const val = Number(validity);
+                        const date = new Date()
+                        date.setMonth(date.getMonth() + val);      
+                        let passfields = {};
+                        passfields.passinfo = {};
+                        if((date -  current)>=0){
+                            passfields.passinfo.passStatus = "Active";
+                        }else{
+                            passfields.passinfo.passStatus = "Expired";
+                        }
+                        // console.log(passinfo);
+                        console.log(passInfo);
+                        passfields.passinfo.passValidity = passInfo[0].travelPassPeriod;
+                        passfields.passinfo.profilePic = profileToVerify.profilePic;
+                        passfields.passinfo.passType = passInfo[0].travelOption;
+                        passfields.passinfo.passStartDate = passInfo[0].appliedOn;
+                        passfields.passinfo.passGivenDate = Date().toString();
+                        passfields.passinfo.passEndDate = date.toString();
+                        passfields.passinfo.passRoute = passInfo[0].startLocation+" to " + passInfo[0].endLocation;
+                        // console.log(passfields);
+                        // res.json({status:200,resp:"COOL"});
+                        if (profileToVerify.applications.currentApplication.passGiven == true) {
+                            console.log("ruunni")
+                            Profile.findOne({email:req.body.email}).then(profilee => {
+                                console.log("haa ha:- "+profilee);
+                                if(profilee){
+                                    Profile.findOneAndUpdate(
+                                    {email: req.body.email},
+                                    {$set: passfields},
+                                    {new: true}
+                                    ).then( async() => {
+
+                                        // }else{
+                                            // Create
+                                            // res.json({status:400,Message:"Please Create a Profile First"});
+                                            // new Profile(profileFields).save().then(profilee => res.json({status:200,profilee}));
+                                            
+                                            
+                                            console.log("Not in IF");
+                        // ========================================================================================
+                        const unapprovedBusProfiles = await Profile.find({'applications.currentApplication.travelOption':'PMPML / Bus','applications.currentApplication.amountPaid':true,'applications.currentApplication.passGiven':false});
+                        const approvedBusProfiles = await Profile.find({'applications.currentApplication.travelOption':'PMPML / Bus','applications.currentApplication.amountPaid':true,'applications.allApplications.passGiven':true});
                         const userType = req.userInfo.type;
                         if(userType === 'bus admin' || userType==='college admin' || userType==='railway admin'){
-                            let unapprovedRailApps = [];
-                            for (let i = 0; i < unapprovedRailProfiles.length; i++) {
-                                unapprovedRailApps.push(unapprovedRailProfiles[i].applications.currentApplication);
+                            let unapprovedBusApps = [];
+                            for (let i = 0; i < unapprovedBusProfiles.length; i++) {
+                                unapprovedBusApps.push(unapprovedBusProfiles[i].applications.currentApplication);
                             }
-                            let approvedRailApps = [];
+                            let approvedBusApps = [];
                             var promises = [];
-                            for (let i = 0; i < approvedRailProfiles.length; i++) {
+                            for (let i = 0; i < approvedBusProfiles.length; i++) {
                                 promises.push(
                                     new Promise((resolve, reject) => {
-                                        for(let j= 0; j<approvedRailProfiles[i].applications.allApplications.length; j++){
-                                            if(approvedRailProfiles[i].applications.allApplications[j].passGiven==true)
-                                            // approvedRailApps.push(approvedRailProfiles[i].profilePic);
-                                            approvedRailApps.push(approvedRailProfiles[i].applications.allApplications[j]);
+                                        for(let j= 0; j<approvedBusProfiles[i].applications.allApplications.length; j++){
+                                            if(approvedBusProfiles[i].applications.allApplications[j].passGiven==true)
+                                            // approvedBusApps.push(approvedBusProfiles[i].profilePic);
+                                            approvedBusApps.push(approvedBusProfiles[i].applications.allApplications[j]);
                                             resolve()
                                         }
                                     })
                                     )
                                 }
                                 Promise.all(promises).then(() => {
-                                    return res.json({status:200, unapprovedRailApps,approvedRailApps});
+                                    return res.json({status:200, unapprovedBusApps,approvedBusApps});
                                 })
                         }else{
                             res.json({erroMsg:'Need Admin Privilages To Access This Route.'});
                         }
-                    
-                    })}
-})
-
-} catch (error) {
-        res.json({status:500, Message:error});
+                        
+                    })}else{
+                        res.json({status:400,message:"No matching Application found / The Applicaion is already approved!"});
+                    }
+                })
+                }    
+    });
+    }else{
+            res.json({status:400,Message:"No Profile Found!"});
+    }
+                })
+            } catch (error) {
+                res.json({status:500, Message:error});
+            }
     }
 
-}
 
 
 
