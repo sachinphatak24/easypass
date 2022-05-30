@@ -40,6 +40,7 @@ const profileSchema = mongoose.Schema({
             paymentId:{type:String},
             paymentPaidOn:{type:String},
             
+            passGiven:{type:Boolean, default:false}
 
 
         },
@@ -62,7 +63,10 @@ const profileSchema = mongoose.Schema({
             amount:{type:String},
             amountPaid:{type:Boolean, default:false},
             paymentId:{type:String},
-            paymentPaidOn:{type:String}
+            paymentPaidOn:{type:String},
+
+            passGiven:{type:Boolean, default:false}
+
         }],
     },
     passinfo:{

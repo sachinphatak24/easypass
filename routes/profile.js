@@ -26,7 +26,7 @@ var transporter = nodemailer.createTransport({
 // =========================================================
 
 // myApps
-import {allProfiles, passInfoCreate, myApps, verifyProfile, adminverifyProfile, adminverifyProfilee, createProfile, currentProfile, adminverifyProfileAll, newApplication, pdfGen, adminGetApp, fullProfile, adminUnApprovedProfiles, adminRejectApp, adminApproveApp, allUsers, busPases, railwayPases, proPic, adminRejectProfilee, deleteAccount} from '../controllers/profiles.js';
+import {allProfiles,railwayPassApprove, busPassApprove, passInfoCreate, myApps, verifyProfile, adminverifyProfile, adminverifyProfilee, createProfile, currentProfile, adminverifyProfileAll, newApplication, pdfGen, adminGetApp, fullProfile, adminUnApprovedProfiles, adminRejectApp, adminApproveApp, allUsers, busPases, railwayPases, proPic, adminRejectProfilee, deleteAccount} from '../controllers/profiles.js';
 
 // =================================
 // order Route
@@ -201,8 +201,11 @@ router.post('/fullprofile',authenticate, fullProfile);
 // ------------------RAILWAY ADMIN Route----------------------- 
 router.get('/railwayPasses',authenticate,railwayPases);
 
+router.post('/railwaypassapprove',authenticate,railwayPassApprove);
+
 // ---------------------BUS ADMIN Route------------------------ 
 router.get('/busPasses',authenticate,busPases);
+router.get('/busPassaprove',authenticate,busPassApprove);
 
 
 //Download Concession Letter
