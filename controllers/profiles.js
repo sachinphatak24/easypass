@@ -1053,7 +1053,7 @@ export const railwayPases = async(req,res) => {
         const approvedRailProfiles = await Profile.find({'applications.currentApplication.travelOption':'Local / Train','applications.currentApplication.amountPaid':true,'applications.allApplications.passGiven':true});
         const userType = req.userInfo.type;
         console.log(unapprovedRailProfiles,approvedRailProfiles);
-        if(userType === 'bus admin' || userType==='college admin' || userType==='railway admin'){
+        if(userType === 'bus admin' || userType==='college admin' || userType==='train admin'){
             let unapprovedRailApps = [];
             for (let i = 0; i < unapprovedRailProfiles.length; i++) {
                 unapprovedRailApps.push(unapprovedRailProfiles[i].applications.currentApplication);
